@@ -42,15 +42,15 @@ extern int mtk_nanohub_cfg_to_hub(uint8_t sensor_id, uint8_t *data, uint8_t coun
 
 int register_lcdinfo_notifier(struct notifier_block *nb);
 int unregister_lcdinfo_notifier(struct notifier_block *nb);
-
-__attribute__((weak)) int register_lcdinfo_notifier() {
+/*
+__attribute__((weak)) int register_lcdinfo_notifier(void) {
     return -1;
 }
 
-__attribute__((weak)) int unregister_lcdinfo_notifier() {
+__attribute__((weak)) int unregister_lcdinfo_notifier(void) {
     return -1;
 }
-
+*/
 enum {
     SAMSUNG = 1,
     BOE,
@@ -63,10 +63,14 @@ enum {
 #define DEVINFO_LOG(fmt, args...)   pr_err(DEV_TAG"%s %d : "fmt, __func__, __LINE__, ##args)
 
 #define UINT2Ptr(n)     (uint32_t *)(n)
+<<<<<<< HEAD
 #define Ptr2UINT32(p)   (uint32_t)(p)
 #define MAG_PARA_OFFSET               8
 #define SOURCE_NUM                    3
 #define MAG_PARA_NUM                  9
+=======
+#define Ptr2UINT32(p)   (uint32_t)(size_t)((void *)(p))
+>>>>>>> c49aca71c3b1... treewide: Fix includes, clang format constructors
 
 #define IS_SUPPROT_HWCALI           (0x01)
 #define IS_IN_FACTORY_MODE          (0x02)
@@ -178,7 +182,7 @@ typedef struct {
     unsigned char       Sensor[256];
 } sensor_config_info_t;
 
-__attribute__((weak)) unsigned int get_project() {
+__attribute__((weak)) unsigned int get_project(void) {
     return -1;
 }
 
@@ -1501,7 +1505,7 @@ int get_msensor_parameter(int num)
     return 0;
 }
 
-void  mag_soft_parameter_init()
+void  mag_soft_parameter_init(void)
 {
     int ret = -1;
     int index = 0;

@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+=======
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright (C) 2018-2020 Oplus. All rights reserved.
+ */
+
+>>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
 #include <linux/interrupt.h>
 #include <linux/i2c.h>
 #include <linux/proc_fs.h>
@@ -20,6 +28,7 @@
 #include <soc/oplus/device_info.h>
 
 #include "oplus_charger.h"
+<<<<<<< HEAD
 #include "oplus_vooc.h"
 #include "oplus_gauge.h"
 #include "oplus_adapter.h"
@@ -99,6 +108,15 @@ int oplus_wpc_get_max_wireless_power(void)
 	}
 }
 
+=======
+#include "oplus_wrap.h"
+#include "oplus_gauge.h"
+#include "oplus_adapter.h"
+#include "oplus_wireless.h"
+
+static struct oplus_wpc_chip *g_wpc_chip = NULL;
+
+>>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
 void oplus_wpc_set_otg_en_val(int value)
 {
 	return;
@@ -137,6 +155,10 @@ void oplus_wpc_set_booster_en_val(int value)
 	}
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
 void oplus_wpc_set_ext1_wired_otg_en_val(int value)
 {
 	if (!g_wpc_chip) {
@@ -227,6 +249,11 @@ void oplus_wpc_dcin_irq_enable(bool enable)
 	return;
 }
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
 bool oplus_wpc_get_wireless_charge_start(void)
 {
 	if (!g_wpc_chip) {
@@ -279,6 +306,11 @@ bool oplus_wpc_get_otg_charging(void)
 	}
 }
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
 bool oplus_wpc_get_ffc_charging(void)
 {
 	if (!g_wpc_chip) {
@@ -370,6 +402,7 @@ void oplus_wpc_print_log(void)
 
 void oplus_wpc_set_wrx_en_value(int value)
 {
+<<<<<<< HEAD
 	if (!g_wpc_chip) {
 		chg_err("g_wpc_chip null, return\n");
 		return;
@@ -382,6 +415,36 @@ void oplus_wpc_set_wrx_en_value(int value)
 	}
 }
 
+=======
+	struct oplus_wpc_chip *chip = g_wpc_chip;
+	if (!chip) {
+		printk(KERN_ERR "[OPLUS_CHG][%s]: oplus_wpc_chip not ready!\n", __func__);
+		return;
+	}
+	if (chip->wpc_gpios.wrx_en_gpio <= 0) {
+		chg_err("wrx_en_gpio not exist, return\n");
+		return;
+	}
+	if (IS_ERR_OR_NULL(chip->wpc_gpios.pinctrl)
+		|| IS_ERR_OR_NULL(chip->wpc_gpios.wrx_en_active)
+		|| IS_ERR_OR_NULL(chip->wpc_gpios.wrx_en_sleep)) {
+		chg_err("pinctrl null, return\n");
+		return;
+	}
+	if (value == 1) {
+		gpio_direction_output(chip->wpc_gpios.wrx_en_gpio, 1);
+		pinctrl_select_state(chip->wpc_gpios.pinctrl,
+			chip->wpc_gpios.wrx_en_active);
+	} else {
+		pinctrl_select_state(chip->wpc_gpios.pinctrl,
+			chip->wpc_gpios.wrx_en_sleep);
+	}
+	chg_err("set value:%d, gpio_val:%d\n",
+		value, gpio_get_value(chip->wpc_gpios.wrx_en_gpio));
+}
+
+
+>>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
 int oplus_wpc_get_wrx_en_val(void)
 {
 	struct oplus_wpc_chip *chip = g_wpc_chip;
@@ -424,6 +487,7 @@ int oplus_wpc_get_wrx_otg_en_val(void)
 
 void oplus_wpc_set_wrx_otg_en_value(int value)
 {
+<<<<<<< HEAD
 	if (!g_wpc_chip) {
 		chg_err("g_wpc_chip null, return\n");
 		return;
@@ -542,4 +606,180 @@ void oplus_get_wpc_chip_handle(struct oplus_wpc_chip **chip)
 void oplus_wpc_init(struct oplus_wpc_chip *chip)
 {
 	g_wpc_chip = chip;
+=======
+	struct oplus_wpc_chip *chip = g_wpc_chip;
+	if (!chip) {
+		printk(KERN_ERR "[OPLUS_CHG][%s]: oplus_wpc_chip not ready!\n", __func__);
+		return;
+	}
+	if (chip->wpc_gpios.wrx_otg_en_gpio <= 0) {
+		chg_err("wrx_otg_en_gpio not exist, return\n");
+		return;
+	}
+	if (IS_ERR_OR_NULL(chip->wpc_gpios.pinctrl)
+		|| IS_ERR_OR_NULL(chip->wpc_gpios.wrx_otg_en_active)
+		|| IS_ERR_OR_NULL(chip->wpc_gpios.wrx_otg_en_sleep)) {
+		chg_err("pinctrl null, return\n");
+		return;
+	}
+	if (value == 1) {
+		gpio_direction_output(chip->wpc_gpios.wrx_otg_en_gpio, 1);
+		pinctrl_select_state(chip->wpc_gpios.pinctrl,
+			chip->wpc_gpios.wrx_otg_en_active);
+	} else {
+		pinctrl_select_state(chip->wpc_gpios.pinctrl,
+			chip->wpc_gpios.wrx_otg_en_sleep);
+	}
+	chg_err("set value:%d, gpio_val:%d\n",
+		value, gpio_get_value(chip->wpc_gpios.wrx_otg_en_gpio));
+}
+
+int oplus_wpc_get_real_type(void)
+{
+	struct oplus_wpc_chip *chip = g_wpc_chip;
+	int real_type = POWER_SUPPLY_TYPE_UNKNOWN;
+
+	if (!chip || !chip->wpc_ops || !chip->wpc_ops->wpc_get_real_type) {
+		printk(KERN_ERR "[OPLUS_CHG][%s]: oplus_wpc_chip not ready!\n", __func__);
+		return real_type;
+        }
+
+	real_type = chip->wpc_ops->wpc_get_real_type();
+
+	return real_type;
+}
+
+static enum power_supply_property oplus_wpc_wireless_props[] = {
+	POWER_SUPPLY_PROP_PRESENT,
+	POWER_SUPPLY_PROP_ONLINE,
+	POWER_SUPPLY_PROP_VOLTAGE_NOW,
+	POWER_SUPPLY_PROP_VOLTAGE_MAX,
+	POWER_SUPPLY_PROP_CURRENT_NOW,
+	POWER_SUPPLY_PROP_CURRENT_MAX,
+};
+
+static int oplus_wpc_wireless_get_prop(struct power_supply *psy,
+				   enum power_supply_property psp,
+				   union power_supply_propval *val)
+{
+	struct oplus_wpc_chip *chip = power_supply_get_drvdata(psy);
+	int rc = 0;
+
+	switch (psp) {
+	case POWER_SUPPLY_PROP_PRESENT:
+	case POWER_SUPPLY_PROP_ONLINE:
+		if (chip && chip->wpc_ops
+			&& chip->wpc_ops->wpc_get_online_status) {
+			val->intval = chip->wpc_ops->wpc_get_online_status();
+		} else {
+			val->intval = 0;
+		}
+		break;
+	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
+		if (chip && chip->wpc_ops
+                        && chip->wpc_ops->wpc_get_voltage_now) {
+                        val->intval = chip->wpc_ops->wpc_get_voltage_now();
+                } else {
+                        val->intval = 0;
+                }
+		break;
+	case POWER_SUPPLY_PROP_VOLTAGE_MAX:
+		val->intval = 0;
+		break;
+	case POWER_SUPPLY_PROP_CURRENT_NOW:
+		if (chip && chip->wpc_ops
+                        && chip->wpc_ops->wpc_get_current_now) {
+                        val->intval = chip->wpc_ops->wpc_get_current_now();
+                } else {
+                        val->intval = 0;
+                }
+		break;
+	case POWER_SUPPLY_PROP_CURRENT_MAX:
+		val->intval = 0;
+		break;
+	default:
+		return -EINVAL;
+	}
+	if (rc < 0) {
+		pr_debug("Couldn't get prop %d rc = %d\n", psp, rc);
+		return -ENODATA;
+	}
+	return 0;
+}
+
+static int oplus_wpc_wireless_set_prop(struct power_supply *psy,
+				   enum power_supply_property psp,
+				   const union power_supply_propval *val)
+{
+	int rc = 0;
+
+	switch (psp) {
+	case POWER_SUPPLY_PROP_VOLTAGE_MAX:
+		break;
+	case POWER_SUPPLY_PROP_CURRENT_MAX:
+		break;
+	case POWER_SUPPLY_PROP_CURRENT_NOW:
+		break;
+	default:
+		chg_err("set prop %d is not supported\n", psp);
+		rc = -EINVAL;
+		break;
+	}
+
+	return rc;
+}
+
+static int oplus_wpc_wireless_prop_is_writeable(struct power_supply *psy,
+					    enum power_supply_property psp)
+{
+	int rc;
+
+	switch (psp) {
+	case POWER_SUPPLY_PROP_VOLTAGE_MAX:
+	case POWER_SUPPLY_PROP_CURRENT_MAX:
+	case POWER_SUPPLY_PROP_CURRENT_NOW:
+		rc = 1;
+		break;
+	default:
+		rc = 0;
+		break;
+	}
+
+	return rc;
+}
+
+
+static const struct power_supply_desc oplus_wpc_wireless_psy_desc = {
+	.name = "wireless",
+	.type = POWER_SUPPLY_TYPE_WIRELESS,
+	.properties = oplus_wpc_wireless_props,
+	.num_properties = ARRAY_SIZE(oplus_wpc_wireless_props),
+	.get_property = oplus_wpc_wireless_get_prop,
+	.set_property = oplus_wpc_wireless_set_prop,
+	.property_is_writeable = oplus_wpc_wireless_prop_is_writeable,
+};
+
+static int oplus_wpc_init_wireless_psy(struct oplus_wpc_chip *chip)
+{
+	struct power_supply_config wireless_cfg = {};
+
+	wireless_cfg.drv_data = chip;
+	wireless_cfg.of_node = chip->dev->of_node;
+	chip->wireless_psy = devm_power_supply_register(
+		chip->dev, &oplus_wpc_wireless_psy_desc, &wireless_cfg);
+	if (IS_ERR(chip->wireless_psy)) {
+		chg_err("Couldn't register wireless power supply\n");
+		return PTR_ERR(chip->wireless_psy);
+	}
+
+	return 0;
+}
+
+
+void oplus_wpc_init(struct oplus_wpc_chip *chip)
+{
+	g_wpc_chip = chip;
+
+	oplus_wpc_init_wireless_psy(chip);
+>>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
 }

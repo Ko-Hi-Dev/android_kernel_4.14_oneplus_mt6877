@@ -65,6 +65,14 @@
 #define PANEL_SERIAL_NUM_REG 0xD8
 #define PANEL_REG_READ_LEN   10
 
+#ifdef OPLUS_BUG_STABILITY
+#define PANEL_SERIAL_NUM_REG 0xA1
+#define PANEL_REG_READ_LEN   10
+#endif /*OPLUS_BUG_STABILITY*/
+
+#define OPLUS_SILKY_MAX_BRIGHTNESS 8191
+#define OPLUS_MAX_BRIGHTNESS 4095
+
 #if IS_ENABLED(CONFIG_DEBUG_FS)
 static struct dentry *mtkfb_dbgfs;
 #endif
@@ -91,6 +99,9 @@ bool g_detail_log;
 bool g_trace_log;
 unsigned int mipi_volt;
 unsigned int disp_met_en;
+static unsigned int m_old_pq_persist_property[32];
+unsigned int m_new_pq_persist_property[32];
+extern int oplus_max_brightness;
 
 int gCaptureOVLEn;
 int gCapturePriLayerDownX = 20;
@@ -357,8 +368,16 @@ int mtk_dprec_logger_get_buf(enum DPREC_LOGGER_PR_TYPE type, char *stringbuf,
 
 	return n;
 }
+<<<<<<< HEAD
 static int readcount = 0;
 extern int panel_serial_number_read(struct drm_crtc *crtc, char cmd, int num);
+=======
+
+#ifdef OPLUS_BUG_STABILITY
+static int readcount = 0;
+extern int panel_serial_number_read(struct drm_crtc *crtc, char cmd, int num);
+#endif /*OPLUS_BUG_STABILITY*/
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 extern int mtk_drm_setbacklight(struct drm_crtc *crtc, unsigned int level);
 int mtkfb_set_backlight_level(unsigned int level)
 {
@@ -371,6 +390,7 @@ int mtkfb_set_backlight_level(unsigned int level)
 		DDPPR_ERR("find crtc fail\n");
 		return 0;
 	}
+<<<<<<< HEAD
 	#ifdef OPLUS_BUG_STABILITY
 	if (get_boot_mode() == NORMAL_BOOT) {
 		if ((level > 1) && (readcount == 0)) {
@@ -380,6 +400,17 @@ int mtkfb_set_backlight_level(unsigned int level)
 		}
 	}
 	#endif
+=======
+
+#ifdef OPLUS_BUG_STABILITY
+	if ((level > 1) && (readcount == 0)) {
+		panel_serial_number_read(crtc, PANEL_SERIAL_NUM_REG, PANEL_REG_READ_LEN);
+		DDPPR_ERR("%s :panel_serial_number_read\n", __func__);
+		readcount = 1;
+	}
+#endif /*OPLUS_BUG_STABILITY*/
+
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	mtk_drm_setbacklight(crtc, level);
 
 	return 0;
@@ -964,6 +995,7 @@ void ddic_dsi_send_cmd_test(unsigned int case_num)
 		vmalloc(sizeof(struct mtk_ddic_dsi_msg));
 	u8 tx[10] = {0};
 	u8 tx_1[10] = {0};
+	u8 tx_2[10] = {0};
 
 	DDPMSG("%s start case_num:%d\n", __func__, case_num);
 
@@ -979,51 +1011,128 @@ void ddic_dsi_send_cmd_test(unsigned int case_num)
 		/* Send 0x34 */
 		cmd_msg->channel = 0;
 		cmd_msg->flags = 0;
-		cmd_msg->tx_cmd_num = 1;
-		cmd_msg->type[0] = 0x05;
-		tx[0] = 0x34;
+		/*	cmd_msg->flags |= MIPI_DSI_MSG_USE_LPM; */
+		cmd_msg->tx_cmd_num = 3;
+
+		/* Send 0x34 */
+		cmd_msg->type[0] = 0x39;
+		tx[0] = 0xff;
+		tx[1] = 0xaa;
+		tx[2] = 0x55;
+		tx[3] = 0xa5;
+		tx[4] = 0x81;
 		cmd_msg->tx_buf[0] = tx;
-		cmd_msg->tx_len[0] = 1;
+		cmd_msg->tx_len[0] = 5;
+
+		/* Send 0x28 */
+		cmd_msg->type[1] = 0x15;
+		tx_1[0] = 0x6f;
+		tx_1[1] = 0x0f;
+		cmd_msg->tx_buf[1] = tx_1;
+		cmd_msg->tx_len[1] = 2;
+
+		cmd_msg->type[2] = 0x15;
+		tx_2[0] = 0xfa;
+		tx_2[1] = 0x01;
+		cmd_msg->tx_buf[2] = tx_2;
+		cmd_msg->tx_len[2] = 2;
 
 		break;
 	}
 	case 2:
 	{
-		/* Send 0x35:0x00 */
+		/* Multiple cmd UT case */
 		cmd_msg->channel = 0;
-		cmd_msg->flags = 0;
-		cmd_msg->tx_cmd_num = 1;
-		cmd_msg->type[0] = 0x15;
-		tx[0] = 0x35;
-		tx[1] = 0x00;
+		cmd_msg->flags |= MIPI_DSI_MSG_USE_LPM;
+		cmd_msg->tx_cmd_num = 3;
+
+		/* Send 0x34 */
+		cmd_msg->type[0] = 0x39;
+		tx[0] = 0xff;
+		tx[1] = 0xaa;
+		tx[2] = 0x55;
+		tx[3] = 0xa5;
+		tx[4] = 0x81;
 		cmd_msg->tx_buf[0] = tx;
-		cmd_msg->tx_len[0] = 2;
+		cmd_msg->tx_len[0] = 5;
+
+		/* Send 0x28 */
+		cmd_msg->type[1] = 0x15;
+		tx_1[0] = 0x6f;
+		tx_1[1] = 0x0f;
+		cmd_msg->tx_buf[1] = tx_1;
+		cmd_msg->tx_len[1] = 2;
+
+		cmd_msg->type[2] = 0x15;
+		tx_2[0] = 0xfa;
+		tx_2[1] = 0x01;
+		cmd_msg->tx_buf[2] = tx_2;
+		cmd_msg->tx_len[2] = 2;
 
 		break;
 	}
 	case 3:
 	{
-		/* Send 0x28 */
+		/* Multiple cmd UT case */
 		cmd_msg->channel = 0;
-		cmd_msg->flags |= MIPI_DSI_MSG_USE_LPM;
-		cmd_msg->tx_cmd_num = 1;
-		cmd_msg->type[0] = 0x05;
-		tx[0] = 0x28;
+		cmd_msg->flags = 0;
+		/*	cmd_msg->flags |= MIPI_DSI_MSG_USE_LPM; */
+		cmd_msg->tx_cmd_num = 3;
+
+		/* Send 0x34 */
+		cmd_msg->type[0] = 0x39;
+		tx[0] = 0xff;
+		tx[1] = 0xaa;
+		tx[2] = 0x55;
+		tx[3] = 0xa5;
+		tx[4] = 0x81;
 		cmd_msg->tx_buf[0] = tx;
-		cmd_msg->tx_len[0] = 1;
+		cmd_msg->tx_len[0] = 5;
+
+		/* Send 0x28 */
+		cmd_msg->type[1] = 0x15;
+		tx_1[0] = 0x6f;
+		tx_1[1] = 0x0f;
+		cmd_msg->tx_buf[1] = tx_1;
+		cmd_msg->tx_len[1] = 2;
+
+		cmd_msg->type[2] = 0x15;
+		tx_2[0] = 0xfa;
+		tx_2[1] = 0x00;
+		cmd_msg->tx_buf[2] = tx_2;
+		cmd_msg->tx_len[2] = 2;
 
 		break;
 	}
 	case 4:
 	{
-		/* Send 0x29 */
+		/* Multiple cmd UT case */
 		cmd_msg->channel = 0;
 		cmd_msg->flags |= MIPI_DSI_MSG_USE_LPM;
-		cmd_msg->tx_cmd_num = 1;
-		cmd_msg->type[0] = 0x05;
-		tx[0] = 0x29;
+		cmd_msg->tx_cmd_num = 3;
+
+		/* Send 0x34 */
+		cmd_msg->type[0] = 0x39;
+		tx[0] = 0xff;
+		tx[1] = 0xaa;
+		tx[2] = 0x55;
+		tx[3] = 0xa5;
+		tx[4] = 0x81;
 		cmd_msg->tx_buf[0] = tx;
-		cmd_msg->tx_len[0] = 1;
+		cmd_msg->tx_len[0] = 5;
+
+		/* Send 0x28 */
+		cmd_msg->type[1] = 0x15;
+		tx_1[0] = 0x6f;
+		tx_1[1] = 0x0f;
+		cmd_msg->tx_buf[1] = tx_1;
+		cmd_msg->tx_len[1] = 2;
+
+		cmd_msg->type[2] = 0x15;
+		tx_2[0] = 0xfa;
+		tx_2[1] = 0x00;
+		cmd_msg->tx_buf[2] = tx_2;
+		cmd_msg->tx_len[2] = 2;
 
 		break;
 	}
@@ -1036,16 +1145,21 @@ void ddic_dsi_send_cmd_test(unsigned int case_num)
 		cmd_msg->tx_cmd_num = 2;
 
 		/* Send 0x34 */
-		cmd_msg->type[0] = 0x05;
-		tx[0] = 0x34;
+		cmd_msg->type[0] = 0x39;
+		tx[0] = 0xff;
+		tx[1] = 0xaa;
+		tx[2] = 0x55;
+		tx[3] = 0xa5;
+		tx[4] = 0x81;
 		cmd_msg->tx_buf[0] = tx;
-		cmd_msg->tx_len[0] = 1;
+		cmd_msg->tx_len[0] = 5;
 
 		/* Send 0x28 */
-		cmd_msg->type[1] = 0x05;
-		tx_1[0] = 0x28;
+		cmd_msg->type[1] = 0x15;
+		tx_1[0] = 0x6f;
+		tx_1[1] = 0x0f;
 		cmd_msg->tx_buf[1] = tx_1;
-		cmd_msg->tx_len[1] = 1;
+		cmd_msg->tx_len[1] = 2;
 
 		break;
 	}
@@ -1053,23 +1167,73 @@ void ddic_dsi_send_cmd_test(unsigned int case_num)
 	{
 		/* Multiple cmd UT case */
 		cmd_msg->channel = 0;
-		cmd_msg->flags = 0;
-		/*	cmd_msg->flags |= MIPI_DSI_MSG_USE_LPM; */
+		cmd_msg->flags |= MIPI_DSI_MSG_USE_LPM;
 		cmd_msg->tx_cmd_num = 2;
 
-		/* Send 0x35 */
+		/* Send 0x34 */
+		cmd_msg->type[0] = 0x39;
+		tx[0] = 0xff;
+		tx[1] = 0xaa;
+		tx[2] = 0x55;
+		tx[3] = 0xa5;
+		tx[4] = 0x81;
+		cmd_msg->tx_buf[0] = tx;
+		cmd_msg->tx_len[0] = 5;
+
+		/* Send 0x28 */
+		cmd_msg->type[1] = 0x15;
+		tx_1[0] = 0x6f;
+		tx_1[1] = 0x0f;
+		cmd_msg->tx_buf[1] = tx_1;
+		cmd_msg->tx_len[1] = 2;
+
+		break;
+	}
+	case 7:
+	{
+		/* Multiple cmd UT case */
+		cmd_msg->channel = 0;
+		cmd_msg->flags = 0;
+		cmd_msg->tx_cmd_num = 1;
+
+		/* Send 0x34 */
 		cmd_msg->type[0] = 0x15;
-		tx[0] = 0x35;
+		tx[0] = 0x0A;
 		tx[1] = 0x00;
 		cmd_msg->tx_buf[0] = tx;
 		cmd_msg->tx_len[0] = 2;
+		break;
+	}
+	case 8:
+	{
+		/* Multiple cmd UT case */
+		cmd_msg->channel = 0;
+		cmd_msg->flags |= MIPI_DSI_MSG_USE_LPM;
+		cmd_msg->tx_cmd_num = 1;
 
-		/* Send 0x29 */
-		cmd_msg->type[1] = 0x05;
-		tx_1[0] = 0x29;
-		cmd_msg->tx_buf[1] = tx_1;
-		cmd_msg->tx_len[1] = 1;
+		/* Send 0x34 */
+		cmd_msg->type[0] = 0x15;
+		tx[0] = 0x6F;
+		tx[1] = 0x0F;
+		cmd_msg->tx_buf[0] = tx;
+		cmd_msg->tx_len[0] = 2;
+		break;
+	}
+	case 9:
+	{
+		/* Multiple cmd UT case */
+		cmd_msg->channel = 0;
+		cmd_msg->flags |= MIPI_DSI_MSG_USE_LPM;
+		cmd_msg->tx_cmd_num = 1;
 
+		cmd_msg->type[0] = 0x39;
+		tx[0] = 0xff;
+		tx[1] = 0xaa;
+		tx[2] = 0x55;
+		tx[3] = 0xa5;
+		tx[4] = 0x81;
+		cmd_msg->tx_buf[0] = tx;
+		cmd_msg->tx_len[0] = 5;
 		break;
 	}
 	default:
@@ -1126,8 +1290,8 @@ void ddic_dsi_read_cmd_test(unsigned int case_num)
 		/* Read 0x0A = 0x1C */
 		cmd_msg->channel = 0;
 		cmd_msg->tx_cmd_num = 1;
-		cmd_msg->type[0] = 0x06;
-		tx[0] = 0x0A;
+		cmd_msg->type[0] = 0x14;
+		tx[0] = 0xFA;
 		cmd_msg->tx_buf[0] = tx;
 		cmd_msg->tx_len[0] = 1;
 
@@ -1164,16 +1328,20 @@ void ddic_dsi_read_cmd_test(unsigned int case_num)
 		/* Read 0xe8 = 0x00,0x01,0x23,0x00 */
 		cmd_msg->channel = 0;
 		cmd_msg->tx_cmd_num = 1;
-		cmd_msg->type[0] = 0x06;
-		tx[0] = 0xe8;
+		cmd_msg->type[0] = 0x14;
+		tx[0] = 0x0A;
 		cmd_msg->tx_buf[0] = tx;
 		cmd_msg->tx_len[0] = 1;
 
 		cmd_msg->rx_cmd_num = 1;
+<<<<<<< HEAD
 		cmd_msg->rx_buf[0] = kmalloc(8 * sizeof(unsigned char),
 			GFP_ATOMIC);
+=======
+		cmd_msg->rx_buf[0] = vmalloc(4 * sizeof(unsigned char));
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		memset(cmd_msg->rx_buf[0], 0, 4);
-		cmd_msg->rx_len[0] = 4;
+		cmd_msg->rx_len[0] = 1;
 
 		break;
 	}
@@ -1397,8 +1565,60 @@ int mtk_dprec_mmp_dump_ovl_layer(struct mtk_plane_state *plane_state)
 	return -1;
 }
 
+<<<<<<< HEAD
 int mtk_drm_ioctl_pq_debug_set_bypass(struct drm_device *dev, void *data,
 	struct drm_file *file_priv)
+=======
+int mtk_drm_ioctl_pq_get_persist_property(struct drm_device *dev, void *data,
+       struct drm_file *file_priv)
+{
+	int i, ret = 0;
+	unsigned int pq_persist_property[32];
+	struct mtk_drm_private *private = dev->dev_private;
+	struct drm_crtc *crtc = private->crtc[0];
+
+	memset(pq_persist_property, 0, sizeof(pq_persist_property));
+	memcpy(pq_persist_property, (unsigned int *)data, sizeof(pq_persist_property));
+
+	for (i = 0; i < DISP_PQ_PROPERTY_MAX; i++) {
+		m_old_pq_persist_property[i] = m_new_pq_persist_property[i];
+		m_new_pq_persist_property[i] = pq_persist_property[i];
+	}
+
+	if (m_new_pq_persist_property[DISP_PQ_SILKY_BRIGHTNESS])
+		oplus_max_brightness = OPLUS_SILKY_MAX_BRIGHTNESS;
+	else
+		oplus_max_brightness = OPLUS_MAX_BRIGHTNESS;
+
+	DDPFUNC("+");
+
+	if (m_old_pq_persist_property[DISP_PQ_COLOR_BYPASS] !=
+			m_new_pq_persist_property[DISP_PQ_COLOR_BYPASS])
+		disp_color_set_bypass(crtc, m_new_pq_persist_property[DISP_PQ_COLOR_BYPASS]);
+
+	if (m_old_pq_persist_property[DISP_PQ_CCORR_BYPASS] !=
+			m_new_pq_persist_property[DISP_PQ_CCORR_BYPASS])
+		disp_ccorr_set_bypass(crtc, m_new_pq_persist_property[DISP_PQ_CCORR_BYPASS]);
+
+	if (m_old_pq_persist_property[DISP_PQ_GAMMA_BYPASS] !=
+			m_new_pq_persist_property[DISP_PQ_GAMMA_BYPASS])
+		disp_gamma_set_bypass(crtc, m_new_pq_persist_property[DISP_PQ_GAMMA_BYPASS]);
+
+	if (m_old_pq_persist_property[DISP_PQ_DITHER_BYPASS] !=
+			m_new_pq_persist_property[DISP_PQ_DITHER_BYPASS])
+		disp_dither_set_bypass(crtc, m_new_pq_persist_property[DISP_PQ_DITHER_BYPASS]);
+	if (m_old_pq_persist_property[DISP_PQ_AAL_BYPASS] !=
+			m_new_pq_persist_property[DISP_PQ_AAL_BYPASS])
+		disp_aal_set_bypass(crtc, m_new_pq_persist_property[DISP_PQ_AAL_BYPASS]);
+
+	DDPFUNC("-");
+
+	return ret;
+}
+
+int mtk_dprec_mmp_dump_cwb_buffer(struct drm_crtc *crtc,
+		void *buffer, unsigned int buf_idx)
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 {
 	int ret = 0;
 	struct mtk_drm_private *private = dev->dev_private;
@@ -1431,8 +1651,265 @@ int mtk_drm_ioctl_pq_debug_set_bypass(struct drm_device *dev, void *data,
 
 	DDPFUNC("-");
 
+<<<<<<< HEAD
 	return ret;
+=======
+	if (!cwb_info->buffer[0].dst_roi.width ||
+		!cwb_info->buffer[0].dst_roi.height) {
+		mtk_rect_make(&cwb_info->buffer[0].dst_roi, 0, 0,
+			MTK_CWB_NO_EFFECT_HRT_MAX_WIDTH,
+			MTK_CWB_NO_EFFECT_HRT_MAX_WIDTH);
+		mtk_rect_make(&cwb_info->buffer[1].dst_roi, 0, 0,
+			MTK_CWB_NO_EFFECT_HRT_MAX_WIDTH,
+			MTK_CWB_NO_EFFECT_HRT_MAX_WIDTH);
+	}
+
+	/*alloc && config two fb*/
+	if (!cwb_info->buffer[0].fb) {
+		mode.width = MTK_CWB_NO_EFFECT_HRT_MAX_WIDTH;
+		mode.height = cwb_info->src_roi.height;
+		mode.pixel_format = DRM_FORMAT_RGB888;
+		mode.pitches[0] = mode.width * 3;
+
+		mtk_gem = mtk_drm_gem_create(
+			crtc->dev, mode.width * mode.height * 3, true);
+		cwb_info->buffer[0].addr_mva = (u32)mtk_gem->dma_addr;
+		cwb_info->buffer[0].addr_va = (u64)mtk_gem->kvaddr;
+
+		cwb_info->buffer[0].fb  =
+			mtk_drm_framebuffer_create(
+			crtc->dev, &mode, &mtk_gem->base);
+		DDPMSG("[capture] b[0].addr_mva:0x%x, addr_va:0x%llx\n",
+				cwb_info->buffer[0].addr_mva,
+				cwb_info->buffer[0].addr_va);
+
+		mtk_gem = mtk_drm_gem_create(
+			crtc->dev, mode.width * mode.height * 3, true);
+		cwb_info->buffer[1].addr_mva = (u32)mtk_gem->dma_addr;
+		cwb_info->buffer[1].addr_va = (u64)mtk_gem->kvaddr;
+
+		cwb_info->buffer[1].fb  =
+			mtk_drm_framebuffer_create(
+			crtc->dev, &mode, &mtk_gem->base);
+		DDPMSG("[capture] b[1].addr_mva:0x%x, addr_va:0x%llx\n",
+				cwb_info->buffer[1].addr_mva,
+				cwb_info->buffer[1].addr_va);
+	}
+
+	DDPMSG("[capture] enable capture, roi:(%d,%d,%d,%d)\n",
+		cwb_info->buffer[0].dst_roi.x,
+		cwb_info->buffer[0].dst_roi.y,
+		cwb_info->buffer[0].dst_roi.width,
+		cwb_info->buffer[0].dst_roi.height);
 }
+
+bool mtk_drm_cwb_enable(int en,
+			const struct mtk_cwb_funcs *funcs,
+			enum CWB_BUFFER_TYPE type)
+{
+	struct drm_crtc *crtc;
+	struct mtk_drm_crtc *mtk_crtc;
+	struct mtk_cwb_info *cwb_info;
+
+	crtc = list_first_entry(&(drm_dev)->mode_config.crtc_list,
+				typeof(*crtc), head);
+	if (!crtc) {
+		DDPPR_ERR("find crtc fail\n");
+		return false;
+	}
+	mtk_crtc = to_mtk_crtc(crtc);
+
+	if (!mtk_crtc->cwb_info) {
+		mtk_crtc->cwb_info = kzalloc(sizeof(struct mtk_cwb_info),
+			GFP_KERNEL);
+		DDPMSG("%s: need allocate memory\n", __func__);
+	}
+	if (!mtk_crtc->cwb_info) {
+		DDPPR_ERR("%s: allocate memory fail\n", __func__);
+		return false;
+	}
+
+	cwb_info = mtk_crtc->cwb_info;
+	if (cwb_info->enable == en) {
+		DDPMSG("[capture] en:%d already effective\n", en);
+		return true;
+	}
+	cwb_info->funcs = funcs;
+	cwb_info->type = type;
+
+	DDP_MUTEX_LOCK(&mtk_crtc->lock, __func__, __LINE__);
+	cwb_info->enable = en;
+	if (en)
+		mtk_drm_cwb_info_init(crtc);
+	else
+		DDPMSG("[capture] disable capture");
+	DDP_MUTEX_UNLOCK(&mtk_crtc->lock, __func__, __LINE__);
+
+	return true;
+}
+#ifdef CONFIG_OPLUS_FEATURE_DISPCAP
+	EXPORT_SYMBOL(mtk_drm_cwb_enable);
+#endif
+
+bool mtk_drm_set_cwb_roi(struct mtk_rect rect)
+{
+	struct drm_crtc *crtc;
+	struct mtk_drm_crtc *mtk_crtc;
+	struct mtk_cwb_info *cwb_info;
+	struct mtk_drm_gem_obj *mtk_gem;
+	struct drm_mode_fb_cmd2 mode = {0};
+
+	crtc = list_first_entry(&(drm_dev)->mode_config.crtc_list,
+				typeof(*crtc), head);
+	if (!crtc) {
+		DDPPR_ERR("find crtc fail\n");
+		return false;
+	}
+
+	mtk_crtc = to_mtk_crtc(crtc);
+	DDP_MUTEX_LOCK(&mtk_crtc->lock, __func__, __LINE__);
+	if (!mtk_crtc->cwb_info) {
+		mtk_crtc->cwb_info = kzalloc(sizeof(struct mtk_cwb_info),
+			GFP_KERNEL);
+			DDPMSG("%s: need allocate memory\n", __func__);
+	}
+	if (!mtk_crtc->cwb_info) {
+		DDPPR_ERR("%s: allocate memory fail\n", __func__);
+		DDP_MUTEX_UNLOCK(&mtk_crtc->lock, __func__, __LINE__);
+		return false;
+	}
+	cwb_info = mtk_crtc->cwb_info;
+	cwb_info->src_roi.width =
+				crtc->state->adjusted_mode.hdisplay;
+	cwb_info->src_roi.height =
+				crtc->state->adjusted_mode.vdisplay;
+
+	if (rect.x >= cwb_info->src_roi.width ||
+		rect.y >= cwb_info->src_roi.height ||
+		!rect.width || !rect.height) {
+		DDP_MUTEX_UNLOCK(&mtk_crtc->lock, __func__, __LINE__);
+		return false;
+	}
+
+	if (rect.width > MTK_CWB_NO_EFFECT_HRT_MAX_WIDTH)
+		rect.width = MTK_CWB_NO_EFFECT_HRT_MAX_WIDTH;
+
+	if (rect.x + rect.width > cwb_info->src_roi.width)
+		rect.width = cwb_info->src_roi.width - rect.x;
+	if (rect.y + rect.height > cwb_info->src_roi.height)
+		rect.height = cwb_info->src_roi.height - rect.y;
+
+	if (!cwb_info->buffer[0].fb) {
+		mode.width = MTK_CWB_NO_EFFECT_HRT_MAX_WIDTH;
+		mode.height = cwb_info->src_roi.height;
+		mode.pixel_format = DRM_FORMAT_RGB888;
+		mode.pitches[0] = mode.width * 3;
+
+		mtk_gem = mtk_drm_gem_create(
+			crtc->dev, mode.width * mode.height * 3, true);
+		cwb_info->buffer[0].addr_mva = (u32)mtk_gem->dma_addr;
+		cwb_info->buffer[0].addr_va = (u64)mtk_gem->kvaddr;
+
+		cwb_info->buffer[0].fb  =
+			mtk_drm_framebuffer_create(
+			crtc->dev, &mode, &mtk_gem->base);
+		DDPMSG("[capture] b[0].addr_mva:0x%x, addr_va:0x%llx\n",
+				cwb_info->buffer[0].addr_mva,
+				cwb_info->buffer[0].addr_va);
+
+		mtk_gem = mtk_drm_gem_create(
+			crtc->dev, mode.width * mode.height * 3, true);
+		cwb_info->buffer[1].addr_mva = (u32)mtk_gem->dma_addr;
+		cwb_info->buffer[1].addr_va = (u64)mtk_gem->kvaddr;
+
+		cwb_info->buffer[1].fb  =
+			mtk_drm_framebuffer_create(
+			crtc->dev, &mode, &mtk_gem->base);
+		DDPMSG("[capture] b[1].addr_mva:0x%x, addr_va:0x%llx\n",
+				cwb_info->buffer[1].addr_mva,
+				cwb_info->buffer[1].addr_va);
+	}
+
+	/* update roi */
+	mtk_rect_make(&cwb_info->buffer[0].dst_roi,
+		rect.x, rect.y, rect.width, rect.height);
+	mtk_rect_make(&cwb_info->buffer[1].dst_roi,
+		rect.x, rect.y, rect.width, rect.height);
+
+	DDPMSG("[capture] change roi:(%d,%d,%d,%d)\n",
+		cwb_info->buffer[0].dst_roi.x,
+		cwb_info->buffer[0].dst_roi.y,
+		cwb_info->buffer[0].dst_roi.width,
+		cwb_info->buffer[0].dst_roi.height);
+
+	DDP_MUTEX_UNLOCK(&mtk_crtc->lock, __func__, __LINE__);
+	return true;
+
+}
+#ifdef CONFIG_OPLUS_FEATURE_DISPCAP
+	EXPORT_SYMBOL(mtk_drm_set_cwb_roi);
+#endif
+
+void mtk_drm_cwb_backup_copy_size(void)
+{
+	struct drm_crtc *crtc;
+	struct mtk_drm_crtc *mtk_crtc;
+	struct mtk_cwb_info *cwb_info;
+	struct mtk_ddp_comp *comp;
+
+	crtc = list_first_entry(&(drm_dev)->mode_config.crtc_list,
+				typeof(*crtc), head);
+	if (!crtc) {
+		DDPPR_ERR("find crtc fail\n");
+		return;
+	}
+	mtk_crtc = to_mtk_crtc(crtc);
+	cwb_info = mtk_crtc->cwb_info;
+
+	if (!cwb_info)
+		return;
+
+	if (!cwb_info->comp) {
+		DDPPR_ERR("[capture] cwb enable, but has not comp\n");
+		return;
+	}
+
+	comp = cwb_info->comp;
+	mtk_ddp_comp_io_cmd(comp, NULL, WDMA_READ_DST_SIZE, cwb_info);
+}
+
+bool mtk_drm_set_cwb_user_buf(void *user_buffer, enum CWB_BUFFER_TYPE type)
+{
+	struct drm_crtc *crtc;
+	struct mtk_drm_crtc *mtk_crtc;
+	struct mtk_cwb_info *cwb_info;
+
+	/* this debug cmd only for crtc0 */
+	crtc = list_first_entry(&(drm_dev)->mode_config.crtc_list,
+				typeof(*crtc), head);
+	if (!crtc) {
+		DDPPR_ERR("find crtc fail\n");
+		return false;
+	}
+	mtk_crtc = to_mtk_crtc(crtc);
+	cwb_info = mtk_crtc->cwb_info;
+
+	if (!cwb_info)
+		return false;
+
+	DDP_MUTEX_LOCK(&mtk_crtc->cwb_lock, __func__, __LINE__);
+	cwb_info->type = type;
+	cwb_info->user_buffer = user_buffer;
+	DDP_MUTEX_UNLOCK(&mtk_crtc->cwb_lock, __func__, __LINE__);
+	DDPMSG("[capture] User set buffer:0x%x, type:%d\n",
+			user_buffer, type);
+
+	return true;
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
+}
+#ifdef CONFIG_OPLUS_FEATURE_DISPCAP
+	EXPORT_SYMBOL(mtk_drm_set_cwb_user_buf);
+#endif
 
 static void process_dbg_opt(const char *opt)
 {
@@ -1783,6 +2260,7 @@ static void process_dbg_opt(const char *opt)
 		unsigned int en, ret;
 
 		ret = sscanf(opt, "osc_ccci:%d\n", &en);
+<<<<<<< HEAD
 			if (ret != 1) {
 				DDPPR_ERR("%d error to parse cmd %s\n",
 					__LINE__, opt);
@@ -1790,6 +2268,16 @@ static void process_dbg_opt(const char *opt)
 			}
 			DDPINFO("osc_ccci:%d\n", en);
 			mtk_disp_osc_ccci_callback(en, 0);
+=======
+                if (ret != 1) {
+                        DDPPR_ERR("%d error to parse cmd %s\n",
+                                __LINE__, opt);
+                        return;
+                }
+
+                DDPINFO("osc_ccci:%d\n", en);
+                mtk_disp_osc_ccci_callback(en, 0);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	/*#endif*/
 	} else if (strncmp(opt, "aal:", 4) == 0) {
 		disp_aal_debug(opt + 4);
@@ -1974,6 +2462,119 @@ static void process_dbg_opt(const char *opt)
 			display_enter_tui();
 		else
 			display_exit_tui();
+<<<<<<< HEAD
+=======
+	}  else if (strncmp(opt, "drm:", 4) == 0) {
+		disp_drm_debug(opt + 4);
+	} else if (strncmp(opt, "hbm:", 4) == 0) {
+		struct drm_crtc *crtc;
+		struct mtk_drm_crtc *mtk_crtc;
+		mtk_drm_idlemgr_kick(__func__, crtc, 1);
+		mtk_crtc = to_mtk_crtc(crtc);
+		if (strncmp(opt + 4, "on", 2) == 0) {
+			disp_aal_set_bypass(crtc, 1);
+			disp_ccorr_set_bypass(crtc, 1);
+			mtk_crtc_check_trigger(mtk_crtc, false, true);
+			mtk_drm_crtc_set_panel_hbm(crtc, NULL, true);
+			mtk_drm_crtc_hbm_wait(crtc, true);
+		} else if (strncmp(opt + 4, "off", 3) == 0) {
+			disp_aal_set_bypass(crtc, 0);
+			disp_ccorr_set_bypass(crtc, 0);
+			mtk_crtc_check_trigger(mtk_crtc, false, true);
+			mtk_drm_crtc_set_panel_hbm(crtc, NULL, false);
+			mtk_drm_crtc_hbm_wait(crtc, false);
+		}
+	} else if (strncmp(opt, "cwb_en:", 7) == 0) {
+		unsigned int ret, enable;
+
+		/* this debug cmd only for crtc0 */
+		ret = sscanf(opt, "cwb_en:%d\n", &enable);
+		if (ret != 1) {
+			DDPMSG("error to parse cmd\n");
+			return;
+		}
+
+		mtk_drm_cwb_enable(enable, &user_cwb_funcs, IMAGE_ONLY);
+	} else if (strncmp(opt, "cwb_roi:", 8) == 0) {
+		unsigned int ret, offset_x, offset_y, clip_w, clip_h;
+		struct mtk_rect rect;
+
+		/* this debug cmd only for crtc0 */
+		ret = sscanf(opt, "cwb_roi:%d,%d,%d,%d\n", &offset_x,
+			     &offset_y, &clip_w, &clip_h);
+		if (ret != 4) {
+			DDPMSG("error to parse cmd\n");
+			return;
+		}
+		rect.x = offset_x;
+		rect.y = offset_y;
+		rect.width = clip_w;
+		rect.height = clip_h;
+
+		mtk_drm_set_cwb_roi(rect);
+	} else if (strncmp(opt, "cwb:", 4) == 0) {
+		unsigned int ret, enable, offset_x, offset_y;
+		unsigned int clip_w, clip_h;
+		struct mtk_rect rect;
+
+		/* this debug cmd only for crtc0 */
+		ret = sscanf(opt, "cwb:%d,%d,%d,%d,%d\n", &enable,
+				&offset_x, &offset_y,
+				&clip_w, &clip_h);
+		if (ret != 5) {
+			DDPMSG("error to parse cmd\n");
+			return;
+		}
+		rect.x = offset_x;
+		rect.y = offset_y;
+		rect.width = clip_w;
+		rect.height = clip_h;
+
+		mtk_drm_set_cwb_roi(rect);
+		mtk_drm_cwb_enable(enable, &user_cwb_funcs, IMAGE_ONLY);
+	} else if (strncmp(opt, "cwb_get_buffer", 14) == 0) {
+		u8 *user_buffer;
+		struct drm_crtc *crtc;
+		struct mtk_drm_crtc *mtk_crtc;
+		struct mtk_cwb_info *cwb_info;
+		int width, height, size, ret;
+
+		/* this debug cmd only for crtc0 */
+		crtc = list_first_entry(&(drm_dev)->mode_config.crtc_list,
+					typeof(*crtc), head);
+		if (!crtc) {
+			DDPPR_ERR("find crtc fail\n");
+			return;
+		}
+
+		mtk_crtc = to_mtk_crtc(crtc);
+		cwb_info = mtk_crtc->cwb_info;
+		if (!cwb_info)
+			return;
+
+		DDP_MUTEX_LOCK(&mtk_crtc->lock, __func__, __LINE__);
+		width = MTK_CWB_NO_EFFECT_HRT_MAX_WIDTH;
+		height = cwb_info->src_roi.height;
+		size = sizeof(u8) * width * height * 3;
+		user_buffer = kzalloc(size, GFP_KERNEL);
+		mtk_drm_set_cwb_user_buf((void *)user_buffer, IMAGE_ONLY);
+		DDP_MUTEX_UNLOCK(&mtk_crtc->lock, __func__, __LINE__);
+		DDPMSG("[capture] wait frame complete\n");
+		ret = wait_for_completion_interruptible_timeout(&cwb_cmp,
+			msecs_to_jiffies(3000));
+		if (ret > 0)
+			DDPMSG("[capture] frame complete done\n");
+		else {
+			DDPMSG("[capture] wait frame timeout(3s)\n");
+			DDP_MUTEX_LOCK(&mtk_crtc->lock, __func__, __LINE__);
+			mtk_drm_set_cwb_user_buf((void *)NULL, IMAGE_ONLY);
+			DDP_MUTEX_UNLOCK(&mtk_crtc->lock, __func__, __LINE__);
+		}
+		kfree(user_buffer);
+		reinit_completion(&cwb_cmp);
+	}  else if (strncmp(opt, "drm:", 4) == 0) {
+		disp_drm_debug(opt + 4);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	}
 
 }
@@ -2057,12 +2658,14 @@ static int idletime_set(void *data, u64 val)
 	if (val > 1000000)
 		val = 1000000;
 
-	crtc = list_first_entry(&(drm_dev)->mode_config.crtc_list,
-				typeof(*crtc), head);
-	if (!crtc) {
-		DDPPR_ERR("find crtc fail\n");
-		return -ENODEV;
+	if((&(drm_dev)->mode_config.crtc_list) != NULL){
+		crtc = list_first_entry(&(drm_dev)->mode_config.crtc_list, typeof(*crtc), head);
+		if (!crtc) {
+			DDPPR_ERR("find crtc fail\n");
+			return -ENODEV;
+		}
 	}
+
 	ret = mtk_drm_set_idle_check_interval(crtc, val);
 	if (ret == 0)
 		return -ENODEV;
@@ -2072,18 +2675,24 @@ static int idletime_set(void *data, u64 val)
 
 static int idletime_get(void *data, u64 *val)
 {
-	struct drm_crtc *crtc;
+	#ifdef CONFIG_DRM_MTK_20817_CUSTOM
 
-	crtc = list_first_entry(&(drm_dev)->mode_config.crtc_list,
-				typeof(*crtc), head);
-	if (!crtc) {
-		DDPPR_ERR("find crtc fail\n");
-		return -ENODEV;
-	}
-	*val = mtk_drm_get_idle_check_interval(crtc);
-	if (*val == 0)
-		return -ENODEV;
+	#else
+    struct drm_crtc *crtc;
+    if((&(drm_dev)->mode_config.crtc_list) != NULL) {
+        crtc = list_first_entry(&(drm_dev)->mode_config.crtc_list, typeof(*crtc), head);
 
+        if (!crtc) {
+            DDPPR_ERR("find crtc fail\n");
+            return -ENODEV;
+        }
+        *val = mtk_drm_get_idle_check_interval(crtc);
+        if (*val == 0)
+            return -ENODEV;
+    }
+    else
+        return -ENODEV;
+	#endif
 	return 0;
 }
 
@@ -2335,9 +2944,17 @@ void get_disp_dbg_buffer(unsigned long *addr, unsigned long *size,
 	}
 }
 
+<<<<<<< HEAD
 struct drm_device *get_drm_device(void){
     return drm_dev;
 }
 EXPORT_SYMBOL(get_drm_device);
+=======
+struct drm_device *get_drm_device(){
+    return drm_dev;
+}
+EXPORT_SYMBOL(get_drm_device);
+//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 

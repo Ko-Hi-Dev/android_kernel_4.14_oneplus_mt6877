@@ -99,6 +99,8 @@ static atomic_t g_aal_eof_irq = ATOMIC_INIT(0);
 static atomic_t g_aal_first_frame = ATOMIC_INIT(0);
 static struct workqueue_struct *aal_flip_wq;
 
+extern unsigned long oplus_display_brightness;
+
 enum AAL_UPDATE_HIST {
 	UPDATE_NONE = 0,
 	UPDATE_SINGLE,
@@ -322,7 +324,8 @@ static void disp_aal_set_interrupt(struct mtk_ddp_comp *comp, int enable)
 		return;
 	}
 
-	if (enable && atomic_read(&g_aal_force_relay) != 1) {
+	if (enable && (atomic_read(&g_aal_force_relay) != 1 ||
+		m_new_pq_persist_property[DISP_PQ_SILKY_BRIGHTNESS])) {
 		/* Enable output frame end interrupt */
 		if (comp == NULL)
 			writel(0x2, default_comp->regs + DISP_AAL_INTEN);
@@ -408,11 +411,11 @@ static void disp_aal_notify_backlight_log(int bl_1024)
 
 void disp_aal_refresh_by_kernel(void)
 {
-	unsigned long flags, clockflags;
+    unsigned long flags, clockflags;
 
-	if (atomic_read(&g_aal_is_init_regs_valid) == 1) {
-		spin_lock_irqsave(&g_aal_irq_en_lock, flags);
-		atomic_set(&g_aal_force_enable_irq, 1);
+    if (atomic_read(&g_aal_is_init_regs_valid) == 1) {
+        spin_lock_irqsave(&g_aal_irq_en_lock, flags);
+        atomic_set(&g_aal_force_enable_irq, 1);
 
 		if (spin_trylock_irqsave(&g_aal_clock_lock, clockflags)) {
 			if (atomic_read(&g_aal_data->is_clock_on) != 1)
@@ -422,16 +425,22 @@ void disp_aal_refresh_by_kernel(void)
 			spin_unlock_irqrestore(&g_aal_clock_lock, clockflags);
 		}
 
-		spin_unlock_irqrestore(&g_aal_irq_en_lock, flags);
-		/* Backlight or Kernel API latency should be smallest */
-		mtk_crtc_check_trigger(default_comp->mtk_crtc, false, true);
-	}
+        spin_unlock_irqrestore(&g_aal_irq_en_lock, flags);
+        /* Backlight or Kernel API latency should be smallest */
+        mtk_crtc_check_trigger(default_comp->mtk_crtc, false, true);
+    }
 }
 
 void disp_aal_notify_backlight_changed(int bl_1024)
 {
 	unsigned long flags;
+<<<<<<< HEAD
 	//int max_backlight = 0;
+=======
+	//#ifdef OPLUS_BUG_STABILITY
+	//int max_backlight = 0;
+	//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	unsigned int service_flags;
 
 	AALAPI_LOG("%d/1023\n", bl_1024);
@@ -440,26 +449,35 @@ void disp_aal_notify_backlight_changed(int bl_1024)
 
 	// FIXME
 	//max_backlight = disp_pwm_get_max_backlight(DISP_PWM0);
+<<<<<<< HEAD
 
 	#ifdef OPLUS_BUG_STABILITY
 	//max_backlight = 2048;
 	//if (bl_1024 > max_backlight)
 	//	bl_1024 = max_backlight;
 	#endif
+=======
+	//#ifdef OPLUS_BUG_STABILITY
+	/*max_backlight = 1024;
+	if (bl_1024 > max_backlight)
+		bl_1024 = max_backlight;*/
+	//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 	atomic_set(&g_aal_backlight_notified, bl_1024);
 
 	service_flags = 0;
 	if (bl_1024 == 0) {
+		oplus_display_brightness = 0;
 		mt_leds_brightness_set("lcd-backlight", 0);
 		/* set backlight = 0 may be not from AAL, */
 		/* we have to let AALService can turn on backlight */
 		/* on phone resumption */
 		service_flags = AAL_SERVICE_FORCE_UPDATE;
 	} else if (atomic_read(&g_aal_is_init_regs_valid) == 0 ||
-		atomic_read(&g_aal_force_relay) == 1) {
+		(atomic_read(&g_aal_force_relay) == 1 && m_new_pq_persist_property[DISP_PQ_SILKY_BRIGHTNESS] == 0)) {
 		/* AAL Service is not running */
-
+		DDPFUNC("BL=%d\n", bl_1024);
 		mt_leds_brightness_set("lcd-backlight", bl_1024);
 	}
 
@@ -490,6 +508,10 @@ int led_brightness_changed_event(struct notifier_block *nb, unsigned long event,
 			* led_conf->cdev.brightness
 			+ ((led_conf->cdev.max_brightness) / 2))
 			/ (led_conf->cdev.max_brightness));
+
+    if (led_conf->cdev.brightness != 0 &&
+			trans_level == 0)
+			trans_level = 1;
 
 		disp_aal_notify_backlight_changed(trans_level);
 		AALAPI_LOG("brightness changed: %d(%d)\n",
@@ -1320,8 +1342,19 @@ int mtk_drm_ioctl_aal_set_param(struct drm_device *dev, void *data,
 	if (atomic_read(&g_aal_backlight_notified) == 0)
 		backlight_value = 0;
 
-	AALAPI_LOG("%d", backlight_value);
-	mt_leds_brightness_set("lcd-backlight", backlight_value);
+	if (m_new_pq_persist_property[DISP_PQ_SILKY_BRIGHTNESS]) {
+		DDPINFO("%s: SILKY_BRIGHTNESS OPEN\n", __func__);
+		if (g_aal_param.silky_bright_flag == 0) {
+			DDPFUNC("backlight_value = %d, silky_bright_flag = %d",
+				backlight_value, g_aal_param.silky_bright_flag);
+			oplus_display_brightness = g_aal_param.FinalBacklight;
+			mt_leds_brightness_set("lcd-backlight", backlight_value);
+		}
+	} else {
+		DDPINFO("%s: SILKY_BRIGHTNESS CLOSE\n", __func__);
+		AALAPI_LOG("%d", backlight_value);
+		mt_leds_brightness_set("lcd-backlight", backlight_value);
+	}
 	AALFLOW_LOG("delay refresh: %d", g_aal_param.refreshLatency);
 	if (g_aal_param.refreshLatency == 33)
 		delay_refresh = true;
@@ -1874,6 +1907,7 @@ static void mtk_aal_stop(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle)
 }
 
 static void mtk_aal_bypass(struct mtk_ddp_comp *comp, int bypass,
+<<<<<<< HEAD
 	struct cmdq_pkt *handle)
 {
 #if 1
@@ -1881,6 +1915,25 @@ static void mtk_aal_bypass(struct mtk_ddp_comp *comp, int bypass,
 	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DISP_AAL_CFG,
 		bypass, 0x1);
 	atomic_set(&g_aal_force_relay, bypass);
+=======
+			struct cmdq_pkt *handle)
+{
+#if 1
+	if (atomic_read(&g_aal_force_relay) != bypass) {
+		AALFLOW_LOG("\n");
+		cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DISP_AAL_CFG,
+			bypass, 0x1);
+		if (comp->mtk_crtc->is_dual_pipe) {
+			struct mtk_drm_crtc *mtk_crtc = comp->mtk_crtc;
+			struct drm_crtc *crtc = &mtk_crtc->base;
+			struct mtk_drm_private *priv = crtc->dev->dev_private;
+			struct mtk_ddp_comp *comp_aal1 = priv->ddp_comp[DDP_COMPONENT_AAL1];
+			cmdq_pkt_write(handle, comp_aal1 ->cmdq_base, comp_aal1 ->regs_pa + DISP_AAL_CFG,
+				bypass, 0x1);
+		}
+		atomic_set(&g_aal_force_relay, bypass);
+	}
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 #else
 	AALFLOW_LOG("is ignored\n");
 #endif
@@ -2261,8 +2314,18 @@ void disp_aal_on_end_of_frame(struct mtk_ddp_comp *comp)
 	//For 120Hz rotation issue
 	do_gettimeofday(&start);
 
+<<<<<<< HEAD
 	atomic_set(&g_aal_eof_irq, 1);
 	if (atomic_read(&g_aal_force_relay) == 1) {
+=======
+	if (comp->id == DDP_COMPONENT_AAL0)
+		atomic_set(&g_aal_eof_irq, 1);
+	if (comp->id == DDP_COMPONENT_AAL1)
+		atomic_set(&g_aal1_eof_irq, 1);
+
+	if (atomic_read(&g_aal_force_relay) == 1 &&
+		!m_new_pq_persist_property[DISP_PQ_SILKY_BRIGHTNESS]) {
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		disp_aal_clear_irq(comp, true);
 		return;
 	}
@@ -2280,7 +2343,8 @@ void disp_aal_on_start_of_frame(void)
 	unsigned long flags;
 	struct mtk_disp_aal *aal_data = comp_to_aal(default_comp);
 
-	if (atomic_read(&g_aal_force_relay) == 1)
+	if (atomic_read(&g_aal_force_relay) == 1 &&
+		!m_new_pq_persist_property[DISP_PQ_SILKY_BRIGHTNESS])
 		return;
 	if (atomic_read(&g_aal_change_to_dre30) != 0x3)
 		return;
@@ -2296,6 +2360,23 @@ void disp_aal_on_start_of_frame(void)
 			disp_aal_update_dre3_sram(default_comp, true);
 		spin_unlock_irqrestore(&g_aal_clock_lock,
 			flags);
+<<<<<<< HEAD
+=======
+
+	if (isDualPQ) {
+		struct mtk_disp_aal *aal1_data = comp_to_aal(aal1_default_comp);
+
+		AALIRQ_LOG("[SRAM] g_aal1_dre_config(%d) in SOF",
+			atomic_read(&g_aal1_dre_config));
+	spin_lock_irqsave(&g_aal_clock_lock, flags);
+	if (atomic_read(&aal_data->is_clock_on) != 1)
+		AALIRQ_LOG("clock is off\n");
+	else
+		disp_aal_update_dre3_sram(default_comp, true);
+	spin_unlock_irqrestore(&g_aal_clock_lock,
+				flags);
+		}
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	}
 #endif
 }
@@ -2344,6 +2425,7 @@ static int mtk_disp_aal_probe(struct platform_device *pdev)
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0)
 		return irq;
+<<<<<<< HEAD
 
 	comp_id = mtk_ddp_comp_get_id(dev->of_node, MTK_DISP_AAL);
 	if ((int)comp_id < 0) {
@@ -2351,6 +2433,8 @@ static int mtk_disp_aal_probe(struct platform_device *pdev)
 		return comp_id;
 	}
 
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	ret = mtk_ddp_comp_init(dev, dev->of_node, &priv->ddp_comp, comp_id,
 				&mtk_disp_aal_funcs);
 	if (ret) {
@@ -2704,6 +2788,14 @@ void disp_aal_set_bypass(struct drm_crtc *crtc, int bypass)
 {
 	int ret;
 
+<<<<<<< HEAD
 	ret = mtk_crtc_user_cmd(crtc, default_comp, BYPASS_AAL, &bypass);
+=======
+	if (atomic_read(&g_aal_force_relay) == bypass)
+		return;
+	ret = mtk_crtc_user_cmd(crtc, default_comp, BYPASS_AAL, &bypass);
+	if (default_comp->mtk_crtc->is_dual_pipe)
+		ret = mtk_crtc_user_cmd(crtc, aal1_default_comp, BYPASS_AAL, &bypass);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	DDPFUNC("ret = %d", ret);
 }

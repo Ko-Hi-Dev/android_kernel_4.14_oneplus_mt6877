@@ -1,11 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_dc.c
 ** Description : oplus dc feature
 ** Version : 1.0
 ** Date : 2020/07/1
+<<<<<<< HEAD
 ** Author : JianBin.Zhang@MM.Display.LCD Driver
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 **
 ** ------------------------------- Revision History: -----------
 **  <author>        <data>        <version >        <desc>
@@ -14,7 +20,11 @@
 #include <oplus_display_common.h>
 #include "display_panel/oplus_display_panel.h"
 
+<<<<<<< HEAD
 #define PANEL_SERIAL_NUM_REG 0xD8
+=======
+#define PANEL_SERIAL_NUM_REG 0xA1
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 #define PANEL_REG_READ_LEN   10
 #define BOE_PANEL_SERIAL_NUM_REG 0xA3
 #define PANEL_SERIAL_NUM_REG_TIANMA 0xD6
@@ -27,11 +37,18 @@ extern unsigned long cabc_back_flag;
 extern void disp_aal_set_dre_en(int enable);
 extern unsigned long silence_mode;
 extern unsigned long oplus_display_brightness;
+<<<<<<< HEAD
+=======
+extern int oplus_max_brightness;
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 extern unsigned long oplus_max_normal_brightness;
 extern uint64_t serial_number;
 extern unsigned long esd_mode;
 extern unsigned long seed_mode;
+<<<<<<< HEAD
 extern unsigned long aod_light_mode;
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 extern struct drm_device* get_drm_device(void);
 extern int mtk_drm_setbacklight(struct drm_crtc *crtc, unsigned int level);
@@ -39,8 +56,11 @@ extern int oplus_mtk_drm_sethbm(struct drm_crtc *crtc, unsigned int hbm_mode);
 extern int panel_serial_number_read(char cmd, int num);
 extern int oplus_mtk_drm_setcabc(struct drm_crtc *crtc, unsigned int hbm_mode);
 extern int oplus_mtk_drm_setseed(struct drm_crtc *crtc, unsigned int seed_mode);
+<<<<<<< HEAD
 extern int mtkfb_set_aod_backlight_level(unsigned int level);
 extern bool oplus_mtk_drm_get_hbm_state(void);
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 enum {
 	CABC_LEVEL_0,
@@ -59,7 +79,11 @@ int oplus_display_set_brightness(void *buf)
 
 	printk("%s %d\n", __func__, oplus_set_brightness);
 
+<<<<<<< HEAD
 	if (oplus_set_brightness > OPLUS_MAX_BRIGHTNESS || oplus_set_brightness < OPLUS_MIN_BRIGHTNESS) {
+=======
+	if (oplus_set_brightness > oplus_max_brightness || oplus_set_brightness < OPLUS_MIN_BRIGHTNESS) {
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		printk(KERN_ERR "%s, brightness:%d out of scope\n", __func__, oplus_set_brightness);
 		return -1;
 	}
@@ -94,6 +118,7 @@ int oplus_display_panel_get_max_brightness(void *buf)
 	return 0;
 }
 
+<<<<<<< HEAD
 int oplus_display_panel_get_oplus_max_brightness(void *buf)
 {
 	unsigned int *brightness = buf;
@@ -109,6 +134,8 @@ int oplus_display_panel_get_oplus_max_brightness(void *buf)
 	return 0;
 }
 
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 int oplus_display_panel_get_hbm(void *buf)
 {
 	unsigned int *hbm = buf;
@@ -148,6 +175,10 @@ int oplus_display_panel_get_serial_number(void *buf)
 {
 	struct panel_serial_number *p_snumber = buf;
 	int ret = 0;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	printk("%s read serial number 0x%x\n", __func__, serial_number);
 	ret = scnprintf(p_snumber->serial_number, PAGE_SIZE, "Get panel serial number: %llx\n", serial_number);
 	return ret;
@@ -287,6 +318,7 @@ int oplus_display_panel_get_vendor(void *buf)
 	return 0;
 }
 
+<<<<<<< HEAD
 int oplus_panel_get_aod_light_mode(void *buf)
 {
 	unsigned int *aod_lm = buf;
@@ -316,6 +348,8 @@ int oplus_panel_set_aod_light_mode(void *buf)
 	return 0;
 }
 
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 int oplus_display_panel_get_seed(void *buf)
 {
 	unsigned int *seed = buf;
@@ -346,6 +380,7 @@ int oplus_display_panel_set_seed(void *buf)
 
 	return 0;
 }
+<<<<<<< HEAD
 =======
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
@@ -649,3 +684,5 @@ int oplus_display_panel_set_seed(void *buf)
 	return 0;
 }
 >>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)

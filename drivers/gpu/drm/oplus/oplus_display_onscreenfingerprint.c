@@ -1,11 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_onscreenfingerprint.h
 ** Description : oplus_display_onscreenfingerprint. implement
 ** Version : 1.0
 ** Date : 2020/05/13
+<<<<<<< HEAD
 ** Author : JianBin.Zhang@PSW.MM.Display.Stability
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 **
 ** ------------------------------- Revision History: -----------
 **  <author>        <data>        <version >        <desc>
@@ -38,6 +44,7 @@ int notify_display_fpd(bool mode) {
 }
 
 /* #endif */ /* OPLUS_FEATURE_ONSCREENFINGERPRINT */
+<<<<<<< HEAD
 =======
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
@@ -78,3 +85,5 @@ int notify_display_fpd(bool mode) {
 
 /* #endif */ /* OPLUS_FEATURE_ONSCREENFINGERPRINT */
 >>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)

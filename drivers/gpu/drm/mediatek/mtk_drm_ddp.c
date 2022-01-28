@@ -5390,7 +5390,6 @@ void mtk_ddp_dual_pipe_dump(struct mtk_drm_crtc *mtk_crtc)
 void mtk_ddp_connect_dual_pipe_path(struct mtk_drm_crtc *mtk_crtc,
 	struct mtk_disp_mutex *mutex)
 {
-	DDPFUNC();
 	if (drm_crtc_index(&mtk_crtc->base) == 1) {
 		if ((&mtk_crtc->base)->state->adjusted_mode.vrefresh == 60)
 			mtk_ddp_ext_dual_pipe_dsc_MT6885(mtk_crtc,
@@ -5398,6 +5397,36 @@ void mtk_ddp_connect_dual_pipe_path(struct mtk_drm_crtc *mtk_crtc,
 		else
 			mtk_ddp_ext_insert_dual_pipe_MT6885(mtk_crtc,
 				mutex);
+<<<<<<< HEAD
+=======
+	} else if (drm_crtc_index(&mtk_crtc->base) == 0) {
+		unsigned int i, j;
+		struct mtk_ddp_comp *comp;
+		struct mtk_ddp_comp **ddp_comp;
+		enum mtk_ddp_comp_id prev_id, next_id;
+
+		DDPINFO("connect dual pipe path\n");
+		for_each_comp_in_dual_pipe(comp, mtk_crtc, i, j) {
+			if (j >= mtk_crtc->dual_pipe_ddp_ctx.ddp_comp_nr[i]) {
+				DDPINFO("exceed comp nr\n");
+				continue;
+			}
+			DDPINFO("%d %d\n", i, j);
+			ddp_comp = mtk_crtc->dual_pipe_ddp_ctx.ddp_comp[i];
+			prev_id = (j == 0 ? DDP_COMPONENT_ID_MAX :
+				ddp_comp[j - 1]->id);
+
+			/*connect the last comp to encoder*/
+			if (j + 1 == mtk_crtc->dual_pipe_ddp_ctx.ddp_comp_nr[i])
+				next_id = DDP_COMPONENT_DSI1;
+			else
+				next_id = ddp_comp[j + 1]->id;
+
+			mtk_ddp_add_comp_to_path(mtk_crtc, ddp_comp[j], prev_id,
+						 next_id);
+			DDPINFO("con %u %u-\n", prev_id, next_id);
+		}
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	}
 }
 

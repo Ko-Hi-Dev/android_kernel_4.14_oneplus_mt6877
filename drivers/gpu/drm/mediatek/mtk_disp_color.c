@@ -3201,6 +3201,7 @@ struct platform_driver mtk_disp_color_driver = {
 		},
 };
 
+<<<<<<< HEAD
 void mtk_color_setbypass(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 		bool bypass)
 {
@@ -3232,6 +3233,8 @@ void mtk_color_setbypass(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 	}
 }
 
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 void disp_color_set_bypass(struct drm_crtc *crtc, int bypass)
 {
 	int ret;

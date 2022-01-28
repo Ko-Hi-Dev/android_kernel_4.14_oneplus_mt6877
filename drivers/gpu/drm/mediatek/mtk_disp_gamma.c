@@ -302,6 +302,13 @@ static int mtk_gamma_user_cmd(struct mtk_ddp_comp *comp,
 		mtk_gamma_bypass(comp, *value, handle);
 	}
 	break;
+	case BYPASS_GAMMA:
+	{
+		int *value = data;
+
+		mtk_gamma_bypass(comp, *value, handle);
+	}
+	break;
 	default:
 		DDPPR_ERR("%s: error cmd: %d\n", __func__, cmd);
 		return -EINVAL;

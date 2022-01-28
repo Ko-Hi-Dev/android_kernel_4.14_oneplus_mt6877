@@ -294,9 +294,15 @@ struct DSI_T0_INS {
 	EXPR(DSI_PORCH_NUM)
 
 enum dsi_porch_type { DECLARE_DSI_PORCH(DECLARE_NUM) };
+<<<<<<< HEAD
 #ifdef OPLUS_FEATURE_AOD
 int power_mode = 2;
 #endif
+=======
+//#ifdef OPLUS_FEATURE_ONSCREENFINGERPRINT
+int power_mode = 2;
+//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 //#ifdef OPLUS_FEATURE_SILENCEMODE
 static int silence_flag = 0;
@@ -306,16 +312,24 @@ extern unsigned long long last_te_time;
 
 //#ifdef OPLUS_FEATURE_ESD
 extern unsigned long esd_flag;
+<<<<<<< HEAD
 //#endif
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 #ifdef OPLUS_FEATURE_ONSCREENFINGERPRINT
 extern void hbm_notify_fingerprint_if_neccessary(void);
 #endif
 
 #ifdef OPLUS_BUG_STABILITY
+<<<<<<< HEAD
 int oplus_last_backlight = 0;
 extern unsigned long oplus_max_normal_brightness;
 extern unsigned long oplus_display_brightness;
 static int flag_global_hbm = 0;
+=======
+void mipi_dsi_dcs_write_gce(struct mtk_dsi *dsi, struct cmdq_pkt *handle,
+				  const void *data, size_t len);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 #endif
 
 static const char * const mtk_dsi_porch_str[] = {
@@ -435,7 +449,14 @@ static void mtk_dsi_mask(struct mtk_dsi *dsi, u32 offset, u32 mask, u32 data)
 static bool mtk_dsi_doze_state(struct mtk_dsi *dsi)
 {
 	struct drm_crtc *crtc = dsi->encoder.crtc;
-	struct mtk_crtc_state *state = to_mtk_crtc_state(crtc->state);
+	struct mtk_crtc_state *state;
+
+	if (!crtc)
+		return 0;
+
+	state = to_mtk_crtc_state(crtc->state);
+	if (!state)
+		return 0;
 
 	return state->prop_val[CRTC_PROP_DOZE_ACTIVE];
 }
@@ -443,7 +464,11 @@ static bool mtk_dsi_doze_state(struct mtk_dsi *dsi)
 static bool mtk_dsi_doze_status_change(struct mtk_dsi *dsi)
 {
 	bool doze_enabled = mtk_dsi_doze_state(dsi);
+<<<<<<< HEAD
 	DDPINFO("debug for %s:doze_enabled=%d, dsi->doze_enabled=%d\n", __func__, doze_enabled, dsi->doze_enabled);
+=======
+	pr_err("debug for %s:doze_enabled=%d, dsi->doze_enabled=%d\n", __func__, doze_enabled, dsi->doze_enabled);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 	if (dsi->doze_enabled == doze_enabled)
 		return false;
@@ -466,7 +491,15 @@ static void mtk_dsi_dphy_timconfig(struct mtk_dsi *dsi, void *handle)
 	ui = 1000 / dsi->data_rate + 0x01;
 	cycle_time = 8000 / dsi->data_rate + 0x01;
 
-	lpx = NS_TO_CYCLE(dsi->data_rate * 0x4B, 0x1F40) + 0x1;
+	/* #ifndef OPLUS_BUG_STABILITY */
+	/* lpx = NS_TO_CYCLE(dsi->data_rate * 0x4B, 0x1F40) + 0x1; */
+	/* #else */ /* OPLUS_BUG_STABILITY */
+	if (dsi->ext->params->oplus_lpx_ns_multiplier) {
+		lpx = NS_TO_CYCLE(dsi->data_rate * dsi->ext->params->oplus_lpx_ns_multiplier, 0x1F40) + 0x1;
+	} else {
+		lpx = NS_TO_CYCLE(dsi->data_rate * 0x4B, 0x1F40) + 0x1;
+	}
+	/* #endif */ /* OPLUS_BUG_STABILITY */
 	hs_prpr = NS_TO_CYCLE((0x40 + 0x5 * ui), cycle_time) + 0x1;
 	hs_zero = NS_TO_CYCLE((0xC8 + 0x0A * ui), cycle_time);
 	hs_zero = hs_zero > hs_prpr ? hs_zero - hs_prpr : hs_zero;
@@ -926,6 +959,10 @@ static int mtk_dsi_poweron(struct mtk_dsi *dsi)
 	if (dsi->ext && dsi->ext->funcs
 			&& dsi->ext->funcs->panel_poweron)
 			dsi->ext->funcs->panel_poweron(dsi->panel);
+<<<<<<< HEAD
+=======
+//	usleep_range(5000, 5100);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	//#endif
 
 	if (dsi->ext) {
@@ -1477,6 +1514,12 @@ static irqreturn_t mtk_dsi_irq_status(int irq, void *dev_id)
 	 * Read LCM will clear the bit.
 	 */
 	/* do not clear vm command done */
+	/* #ifdef OPLUS_FEATURE_AOD */
+	if (status & VM_CMD_DONE_INT_EN)
+		DDPINFO("VM CMD done\n");
+	if (status & 2)
+		DDPINFO("DSI cmd done\n");
+	/* #endif */ /* OPLUS_FEATURE_AOD */
 	status &= 0xffde;
 	if (status) {
 		writel(~status, dsi->regs + DSI_INTSTA);
@@ -1543,9 +1586,15 @@ static irqreturn_t mtk_dsi_irq_status(int irq, void *dev_id)
 
 			if (dsi->ddp_comp.id == DDP_COMPONENT_DSI0) {
 				unsigned long long ext_te_time = sched_clock();
+<<<<<<< HEAD
 				#ifdef OPLUS_BUG_STABILITY
 				last_te_time = ext_te_time;
 				#endif
+=======
+				//#ifdef OPLUS_BUG_STABILITY
+				last_te_time = ext_te_time;
+				//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 				lcm_fps_ctx_update(ext_te_time, 0, 0);
 			}
 			mtk_crtc = dsi->ddp_comp.mtk_crtc;
@@ -1590,9 +1639,15 @@ static irqreturn_t mtk_dsi_irq_status(int irq, void *dev_id)
 
 		if (status & FRAME_DONE_INT_FLAG) {
 			struct mtk_drm_private *priv = NULL;
+<<<<<<< HEAD
 			#ifdef OPLUS_FEATURE_AOD
 			DDPINFO("dsi frame done\n");
 			#endif /* OPLUS_FEATURE_AOD */
+=======
+			/* #ifdef OPLUS_FEATURE_AOD */
+			DDPINFO("dsi frame done\n");
+			/* #endif */ /* OPLUS_FEATURE_AOD */
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 			mtk_crtc = dsi->ddp_comp.mtk_crtc;
 
@@ -1660,7 +1715,11 @@ static void mtk_dsi_poweroff(struct mtk_dsi *dsi)
 	writel(0, dsi->regs + DSI_CMDQ0);
 
 	phy_power_off(dsi->phy);
+<<<<<<< HEAD
 #endif
+=======
+//	usleep_range(5000, 5100);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	if (dsi->ext && dsi->ext->funcs
                && dsi->ext->funcs->panel_poweroff)
                dsi->ext->funcs->panel_poweroff(dsi->panel);
@@ -1769,6 +1828,7 @@ static void mtk_dsi_exit_ulps(struct mtk_dsi *dsi)
 }
 
 static int mtk_dsi_stop_vdo_mode(struct mtk_dsi *dsi, void *handle);
+<<<<<<< HEAD
 #ifdef OPLUS_FEATURE_AOD
 static unsigned char prev_power_mode;
 #endif
@@ -1777,9 +1837,18 @@ static unsigned char prev_power_mode;
 void mipi_dsi_dcs_write_gce(struct mtk_dsi *dsi, struct cmdq_pkt *handle,
 					  const void *data, size_t len);
 /*#endif*/
+=======
+//#ifndef NO_AOD_6873
+static unsigned char prev_power_mode;
+//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 static void mipi_dsi_dcs_write_gce2(struct mtk_dsi *dsi, struct cmdq_pkt *dummy,
 					  const void *data, size_t len);
+/*#ifdef OPLUS_BUG_STABILITY*/
+void mipi_dsi_dcs_write_gce(struct mtk_dsi *dsi, struct cmdq_pkt *handle,
+                                  const void *data, size_t len);
+/*#endif*/
 
 static void mtk_output_en_doze_switch(struct mtk_dsi *dsi)
 {
@@ -1854,6 +1923,7 @@ static void mtk_output_en_doze_switch(struct mtk_dsi *dsi)
 		}
 
 		if (!mtk_dsi_is_cmd_mode(&dsi->ddp_comp)) {
+			DDPINFO("%s DSI switch video mode \n",__func__);
 			mtk_dsi_set_vm_cmd(dsi);
 			mtk_dsi_calc_vdo_timing(dsi);
 			mtk_dsi_config_vdo_timing(dsi);
@@ -1863,11 +1933,19 @@ static void mtk_output_en_doze_switch(struct mtk_dsi *dsi)
 		}
 	}
 
+<<<<<<< HEAD
 	#ifndef OPLUS_FEATURE_AOD
 	/*if (doze_enabled && panel_funcs->doze_enable)
 		panel_funcs->doze_enable(dsi->panel, dsi,
 			mipi_dsi_dcs_write_gce2, NULL);*/
 	#else
+=======
+	//#ifndef OPLUS_AOD_FEATURE
+	/*if (doze_enabled && panel_funcs->doze_enable)
+		panel_funcs->doze_enable(dsi->panel, dsi,
+			mipi_dsi_dcs_write_gce2, NULL);*/
+	//#else
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	if (doze_enabled && panel_funcs->doze_enable) {
 		panel_funcs->doze_enable(dsi->panel, dsi,
 			mipi_dsi_dcs_write_gce2, NULL);
@@ -1875,7 +1953,11 @@ static void mtk_output_en_doze_switch(struct mtk_dsi *dsi)
 		        panel_funcs->hbm_set_state(dsi->panel, false);
 		}
 	}
+<<<<<<< HEAD
 	#endif
+=======
+	//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 	if (doze_enabled && panel_funcs->doze_area)
 		panel_funcs->doze_area(dsi->panel, dsi,
@@ -1996,6 +2078,71 @@ static void mtk_output_dsi_enable(struct mtk_dsi *dsi,
 	mtk_dsi_exit_ulps(dsi);
 	mtk_dsi_clk_hs_mode(dsi, 0);
 
+<<<<<<< HEAD
+=======
+	return 0;
+}
+
+static void mtk_output_dsi_enable(struct mtk_dsi *dsi,
+	int force_lcm_update)
+{
+	int ret;
+	struct mtk_panel_ext *ext = dsi->ext;
+	bool new_doze_state = mtk_dsi_doze_state(dsi);
+	struct drm_crtc *crtc = dsi->encoder.crtc;
+	struct mtk_drm_crtc *mtk_crtc = to_mtk_crtc(crtc);
+	struct mtk_crtc_state *mtk_state = to_mtk_crtc_state(crtc->state);
+	unsigned int mode_id = mtk_state->prop_val[CRTC_PROP_DISP_MODE_IDX];
+	unsigned int fps_chg_index = 0;
+
+	int blank_mode = FB_BLANK_POWERDOWN;
+	struct fb_event event;
+	//#endif
+	DDPINFO("%s +\n", __func__);
+	//#ifdef OPLUS_FEATURE_AOD
+	if(new_doze_state == 1)
+		power_mode = 1;
+
+	if(new_doze_state == 0)
+		power_mode = 2;
+
+	pr_err("debug for display power status:%s, = %d, dsi->output_en=%d\n", __func__, power_mode,dsi->output_en);
+	//#endif
+
+	if (dsi->output_en) {
+		if (mtk_dsi_doze_status_change(dsi)) {
+			event.info  = NULL;
+			event.data = &blank_mode;
+			pr_info("%s for gesture\n", __func__);
+			fb_notifier_call_chain(FB_EARLY_EVENT_BLANK, &event);
+			fb_notifier_call_chain(FB_EVENT_BLANK, &event);
+			//#endif
+			mtk_dsi_pre_cmd(dsi, crtc);
+			mtk_output_en_doze_switch(dsi);
+			mtk_dsi_post_cmd(dsi, crtc);
+		} else
+			DDPINFO("dsi is initialized\n");
+		//#ifdef OPLUS_FEATURE_AOD
+		prev_power_mode = power_mode;
+		//#endif
+		return;
+	}
+
+	if (dsi->slave_dsi) {
+		ret = mtk_preconfig_dsi_enable(dsi->slave_dsi);
+		if (ret < 0) {
+			dev_err(dsi->dev, "config slave dsi fail: %d", ret);
+			return;
+		}
+	}
+
+	ret = mtk_preconfig_dsi_enable(dsi);
+	if (ret < 0) {
+		dev_err(dsi->dev, "config dsi fail: %d", ret);
+		return;
+	}
+
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	DDPINFO("%s: dsi->doze_enabled=%d, force_lcm_update=%d\n", __func__, dsi->doze_enabled, force_lcm_update);
 	if (dsi->panel) {
 		if ((!dsi->doze_enabled || force_lcm_update)
@@ -2003,17 +2150,33 @@ static void mtk_output_dsi_enable(struct mtk_dsi *dsi,
 			DDPPR_ERR("failed to prepare the panel\n");
 			return;
 		}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		//#ifdef OPLUS_FEATURE_ESD
 		/* this code phase maybe after mode_switch*/
 		if (esd_flag == 1){
 			if (ext && ext->funcs
 				&& ext->funcs->esd_backlight_recovery){
 					ext->funcs->esd_backlight_recovery(dsi,
+<<<<<<< HEAD
 						mipi_dsi_dcs_write_gce2,
 						NULL);
 				}
 		}
 		//#endif
+=======
+					       mipi_dsi_dcs_write_gce2,
+					       NULL);
+			}
+		}
+		//#endif
+
+		DDPINFO("%s:continue before doze_enable\n", __func__);
+		fps_chg_index = mtk_crtc->fps_change_index;
+
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		/* add for ESD recovery */
 		if (mtk_dsi_is_cmd_mode(&dsi->ddp_comp) && mode_id != 0) {
 			if (dsi->ext && dsi->ext->funcs &&
@@ -2034,6 +2197,11 @@ static void mtk_output_dsi_enable(struct mtk_dsi *dsi,
 				&& ext->funcs->doze_enable)
 				ext->funcs->doze_enable(dsi->panel, dsi,
 					mipi_dsi_dcs_write_gce2, NULL);
+			/* #ifdef OPLUS_FEATURE_AOD */
+			if (ext && ext->funcs && ext->funcs->doze_area_set){
+				ext->funcs->doze_area_set(dsi,mipi_dsi_dcs_write_gce2,NULL);
+			}
+			/* #endif */ /* OPLUS_FEATURE_AOD */
 			if (ext && ext->funcs
 				&& ext->funcs->doze_area)
 				ext->funcs->doze_area(dsi->panel, dsi,
@@ -2073,6 +2241,7 @@ static void mtk_output_dsi_enable(struct mtk_dsi *dsi,
 			/* We use doze_get_mode_flags to determine if
 			 * there has CV switch in Doze mode.
 			 */
+			DDPINFO("%s mtk_dsi_doze_status_change+\n", __func__);
 			if (ext && ext->funcs
 				&& ext->funcs->doze_post_disp_on
 				&& ext->funcs->doze_get_mode_flags)
@@ -2138,7 +2307,11 @@ static void mtk_output_dsi_disable(struct mtk_dsi *dsi,
 	struct mtk_drm_crtc *mtk_crtc = to_mtk_crtc(dsi->encoder.crtc);
 
 	DDPINFO("%s+ doze_enabled:%d\n", __func__, new_doze_state);
+<<<<<<< HEAD
 	#ifdef OPLUS_FEATURE_AOD
+=======
+	//#ifdef OPLUS_FEATURE_AOD
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	if(new_doze_state == 1)
 		power_mode = 3;
 
@@ -2146,7 +2319,11 @@ static void mtk_output_dsi_disable(struct mtk_dsi *dsi,
 		power_mode = 0;
 
 	pr_err("debug for display power status:%s, = %d\n", __func__, power_mode);
+<<<<<<< HEAD
 	#endif
+=======
+	//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	if (!dsi->output_en)
 		return;
 
@@ -2693,6 +2870,104 @@ int mtk_dsi_read_gce_v2(struct mtk_ddp_comp *comp, void *handle,
 	return 0;
 }
 
+int mtk_dsi_read_gce_v1(struct mtk_ddp_comp *comp, void *handle,
+				struct DSI_T0_INS *t0, int i, uintptr_t slot, int size)
+{
+	int read_return;
+
+	struct mtk_dsi *dsi = container_of(comp, struct mtk_dsi, ddp_comp);
+	dma_addr_t read_slot = (dma_addr_t)slot;
+
+	read_return =  0x0003700 | ((size <= 10 ? size : 10) << 16);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_CMDQ0,
+		read_return, ~0);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_CMDQ1,
+		AS_UINT32(t0), ~0);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_CMDQ_SIZE,
+		0x2, ~0);
+
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_START,
+		0x0, ~0);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_START,
+		0x1, ~0);
+
+	mtk_dsi_cmdq_poll(comp, handle, comp->regs_pa + DSI_INTSTA, 0x1, 0x1);
+
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_INTSTA,
+		0x0, 0x1);
+
+	cmdq_pkt_mem_move(handle, comp->cmdq_base,
+		comp->regs_pa + DSI_RX_DATA0, read_slot + (i * 2) * 0x4,
+		CMDQ_THR_SPR_IDX3);
+	cmdq_pkt_mem_move(handle, comp->cmdq_base,
+		comp->regs_pa + DSI_RX_DATA1, read_slot + (i * 2 + 1) * 0x4,
+		CMDQ_THR_SPR_IDX3);
+	cmdq_pkt_mem_move(handle, comp->cmdq_base,
+		comp->regs_pa + DSI_RX_DATA2, read_slot + (i * 2 + 2) * 0x4,
+		CMDQ_THR_SPR_IDX3);
+	cmdq_pkt_mem_move(handle, comp->cmdq_base,
+		comp->regs_pa + DSI_RX_DATA3, read_slot + (i * 2 + 3) * 0x4,
+		CMDQ_THR_SPR_IDX3);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_RACK,
+		0x1, 0x1);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_INTSTA,
+		0x0, 0x1);
+
+	mtk_dsi_poll_for_idle(dsi, handle);
+
+	return 0;
+}
+
+int mtk_dsi_read_gce_v2(struct mtk_ddp_comp *comp, void *handle,
+        struct DSI_T0_INS *t0, struct DSI_T0_INS *t1,  int i, uintptr_t slot, int size)
+{
+	int read_return;
+
+	struct mtk_dsi *dsi = container_of(comp, struct mtk_dsi, ddp_comp);
+	dma_addr_t read_slot = (dma_addr_t)slot;
+
+	read_return =  0x0003700 | ((size <= 10 ? size : 10) << 16);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_CMDQ0,
+	                AS_UINT32(t1), ~0);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_CMDQ1,
+	                read_return, ~0);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_CMDQ2,
+	                AS_UINT32(t0), ~0);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_CMDQ_SIZE,
+	                0x3, ~0);
+
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_START,
+	                0x0, ~0);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_START,
+	                0x1, ~0);
+
+	mtk_dsi_cmdq_poll(comp, handle, comp->regs_pa + DSI_INTSTA, 0x1, 0x1);
+
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_INTSTA,
+	                0x0, 0x1);
+
+	cmdq_pkt_mem_move(handle, comp->cmdq_base,
+	  comp->regs_pa + DSI_RX_DATA0, read_slot + (i * 2) * 0x4,
+	  CMDQ_THR_SPR_IDX3);
+	cmdq_pkt_mem_move(handle, comp->cmdq_base,
+	  comp->regs_pa + DSI_RX_DATA1, read_slot + (i * 2 + 1) * 0x4,
+	  CMDQ_THR_SPR_IDX3);
+	cmdq_pkt_mem_move(handle, comp->cmdq_base,
+	  comp->regs_pa + DSI_RX_DATA2, read_slot + (i * 2 + 2) * 0x4,
+	  CMDQ_THR_SPR_IDX3);
+	cmdq_pkt_mem_move(handle, comp->cmdq_base,
+	  comp->regs_pa + DSI_RX_DATA3, read_slot + (i * 2 + 3) * 0x4,
+	  CMDQ_THR_SPR_IDX3);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_RACK,
+	  0x1, 0x1);
+	cmdq_pkt_write(handle, comp->cmdq_base, comp->regs_pa + DSI_INTSTA,
+	  0x0, 0x1);
+
+	mtk_dsi_poll_for_idle(dsi, handle);
+
+	return 0;
+}
+
 int mtk_dsi_esd_read(struct mtk_ddp_comp *comp, void *handle, uintptr_t slot)
 {
 	int i;
@@ -2700,7 +2975,7 @@ int mtk_dsi_esd_read(struct mtk_ddp_comp *comp, void *handle, uintptr_t slot)
 	struct mtk_dsi *dsi = container_of(comp, struct mtk_dsi, ddp_comp);
 	struct mtk_panel_params *params;
 
-	if (dsi->ext && dsi->ext->params)
+	if (dsi && dsi->ext && dsi->ext->params)
 		params = dsi->ext->params;
 	else /* can't find panel ext information, stop esd read */
 		return 0;
@@ -2709,6 +2984,10 @@ int mtk_dsi_esd_read(struct mtk_ddp_comp *comp, void *handle, uintptr_t slot)
 
 		if (params->lcm_esd_check_table[i].cmd == 0)
 			break;
+#ifdef OPLUS_BUG_STABILITY
+		if (dsi->ext->funcs && dsi->ext->funcs->esd_check_precondition)
+			dsi->ext->funcs->esd_check_precondition(dsi, mipi_dsi_dcs_write_gce, handle);
+#endif
 
 		t0.CONFG = 0x04;
 		t0.Data0 = params->lcm_esd_check_table[i].cmd;
@@ -2742,13 +3021,19 @@ int mtk_dsi_dcs_read_reg_v1(struct mtk_ddp_comp *comp, void *handle, char *param
 		return 0;
 	mutex_lock(&comp->mtk_crtc->lock);
 
+<<<<<<< HEAD
 #ifdef OPLUS_BUG_STABILITY
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	if(!comp->mtk_crtc->enabled) {
 		mutex_unlock(&comp->mtk_crtc->lock);
 		return 0;
 	}
 	mtk_drm_idlemgr_kick(__func__, crtc, 0);
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 	if (param[2] != 0) {
 		t1.CONFG = 0x00;
@@ -2763,10 +3048,13 @@ int mtk_dsi_dcs_read_reg_v1(struct mtk_ddp_comp *comp, void *handle, char *param
 	DSI_GERNERIC_READ_LONG_PACKET_ID;
 	t0.Data1 = 0;
 
+<<<<<<< HEAD
 #ifdef OPLUS_BUG_STABILITY
 	if (dsi && dsi->ext && dsi->ext->funcs && dsi->ext->funcs->send_cmd_before_dsi_read)
 		dsi->ext->funcs->send_cmd_before_dsi_read(dsi->panel);
 #endif
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	mtk_crtc_pkt_create(&cmdq_handle, crtc,
 		comp->mtk_crtc->gce_obj.client[CLIENT_CFG]);
 	if (mtk_crtc_with_sub_path(crtc, comp->mtk_crtc->ddp_mode))
@@ -2943,6 +3231,7 @@ int mtk_dsi_esd_cmp(struct mtk_ddp_comp *comp, void *handle, void *slot)
 		else
 			chk_val = (tmp0 >> 8) & 0xff;
 
+<<<<<<< HEAD
 		if (lcm_esd_tb->mask_list[0])
 			chk_val = chk_val & lcm_esd_tb->mask_list[0];
 
@@ -2968,6 +3257,34 @@ int mtk_dsi_esd_cmp(struct mtk_ddp_comp *comp, void *handle, void *slot)
 			}
 			#endif
 			break;
+=======
+		if(params->esd_two_para_compare == 1) {
+			if ((chk_val == lcm_esd_tb->para_list[0]) || (chk_val == lcm_esd_tb->mask_list[0])) {
+			DDPPR_ERR("[DSI]lcm_esd_tb->cmd=0x%x,read(0x%x) = expect(0x%x),(0x%x)\n",
+					lcm_esd_tb->cmd,chk_val, lcm_esd_tb->para_list[0], lcm_esd_tb->mask_list[0]);
+			ret = 0;
+			} else {
+				DDPPR_ERR("[DSI]cmp fail:lcm_esd_tb->cmd=0x%x,read(0x%x)!=expect(0x%x)\n",
+					lcm_esd_tb->cmd,chk_val, lcm_esd_tb->para_list[0]);
+				ret = -1;
+				break;
+			}
+		}
+		else {
+			if (lcm_esd_tb->mask_list[0])
+				chk_val = chk_val & lcm_esd_tb->mask_list[0];
+
+			DDPPR_ERR("[DSI] ESD:read(0x%x), expect(0x%x)\n",chk_val, lcm_esd_tb->para_list[0]);
+
+			if (chk_val == lcm_esd_tb->para_list[0]) {
+				ret = 0;
+			} else {
+				DDPPR_ERR("[DSI]cmp fail:read(0x%x)!=expect(0x%x)\n",
+					  chk_val, lcm_esd_tb->para_list[0]);
+				ret = -1;
+				break;
+			}
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		}
 	}
 
@@ -3136,6 +3453,8 @@ unsigned int mtk_dsi_fps_change_index(struct mtk_dsi *dsi,
 	if (new_get_sta)
 		DDPINFO("%s,error:not support dst MODE:(%d)\n", __func__,
 			dst_mode_idx);
+	if (get_panel_ext)
+        adjust_panel_params = get_panel_ext->params;
 
 	if (get_panel_ext)
 		adjust_panel_params = get_panel_ext->params;
@@ -3189,6 +3508,7 @@ unsigned int mtk_dsi_fps_change_index(struct mtk_dsi *dsi,
 	}
 
 	mtk_crtc->fps_change_index = fps_chg_index;
+<<<<<<< HEAD
 #ifdef OPLUS_BUG_STABILITY
 /* Add for OSC hopping change*/
 	if (fps_chg_index == DYNFPS_DSI_MIPI_CLK) {
@@ -3198,6 +3518,14 @@ unsigned int mtk_dsi_fps_change_index(struct mtk_dsi *dsi,
 		mtk_mipi_tx_pll_rate_set_adpt(dsi->phy, data_rate);
 	}
 #endif /*OPLUS_BUG_STABILITY*/
+=======
+	if (fps_chg_index == DYNFPS_DSI_MIPI_CLK) {
+        unsigned int data_rate = 0;
+		if (dsi->mipi_hopping_sta && adjust_panel_params->dyn.switch_en)
+		data_rate = adjust_panel_params->dyn.data_rate;
+		mtk_mipi_tx_pll_rate_set_adpt(dsi->phy, data_rate);
+    }
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	DDPINFO("%s,chg %d->%d\n", __func__, old_mode->vrefresh,
 		adjust_mode->vrefresh);
 	DDPINFO("%s,mipi_hopping_sta %d,chg solution:0x%x\n", __func__,
@@ -3854,7 +4182,11 @@ static void mtk_dsi_cmdq_gce_hs(struct mtk_dsi *dsi, struct cmdq_pkt *handle,
 			goto_addr, (0xFFu << ((goto_addr & 0x3u) * 8)),
 			handle);
 
+<<<<<<< HEAD
 		DDPINFO("set cmdqaddr %lx, val:%x, mask %x\n", goto_addr,
+=======
+		DDPDBG("set cmdqaddr %lx, val:%x, mask %x\n", goto_addr,
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 			tx_buf[i] << ((goto_addr & 0x3u) * 8),
 			(0xFFu << ((goto_addr & 0x3u) * 8)));
 	}
@@ -3866,13 +4198,21 @@ static void mtk_dsi_cmdq_gce_hs(struct mtk_dsi *dsi, struct cmdq_pkt *handle,
 	mtk_ddp_write_mask(&dsi->ddp_comp, reg_val,
 				dsi->driver_data->reg_cmdq_ofs,
 				cmdq_mask, handle);
+<<<<<<< HEAD
 	DDPINFO("set cmdqaddr %u, val:%x, mask %x\n",
+=======
+	DDPDBG("set cmdqaddr %u, val:%x, mask %x\n",
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 			dsi->driver_data->reg_cmdq_ofs,
 			reg_val,
 			cmdq_mask);
 	mtk_ddp_write_mask(&dsi->ddp_comp, cmdq_size,
 				DSI_CMDQ_SIZE, CMDQ_SIZE, handle);
+<<<<<<< HEAD
 	DDPINFO("set cmdqaddr %u, val:%x, mask %x\n", DSI_CMDQ_SIZE, cmdq_size,
+=======
+	DDPDBG("set cmdqaddr %u, val:%x, mask %x\n", DSI_CMDQ_SIZE, cmdq_size,
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 			CMDQ_SIZE);
 }
 //#endif
@@ -4832,6 +5172,7 @@ done:
 static ssize_t mtk_dsi_host_send_cmd(struct mtk_dsi *dsi,
 				     const struct mipi_dsi_msg *msg, u8 flag)
 {
+	DDPINFO("%s\n", __func__);
 	mtk_dsi_wait_idle(dsi, flag, 2000, NULL);
 	mtk_dsi_irq_data_clear(dsi, flag);
 	mtk_dsi_cmdq(dsi, msg);
@@ -5136,6 +5477,12 @@ static void mtk_dsi_cmd_timing_change(struct mtk_dsi *dsi,
 		MTK_DRM_OPT_DYN_MIPI_CHANGE)))
 		need_mipi_change = 0;
 
+	/* Make sure CLIENT_DSI_CFG cmdq flush done. */
+	mtk_crtc_pkt_create(&cmdq_handle, &mtk_crtc->base,
+		mtk_crtc->gce_obj.client[CLIENT_DSI_CFG]);
+	cmdq_pkt_flush(cmdq_handle);
+	cmdq_pkt_destroy(cmdq_handle);
+
 	mtk_crtc_pkt_create(&cmdq_handle, &mtk_crtc->base,
 		mtk_crtc->gce_obj.client[CLIENT_CFG]);
 	if (IS_ERR_OR_NULL(cmdq_handle)) {
@@ -5420,13 +5767,19 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 	case ESD_CHECK_READ:
 		mtk_dsi_esd_read(comp, handle, (uintptr_t)params);
 		break;
+	case DSI_READ:
+		mtk_dsi_dcs_read_reg_v1(comp, handle, (char *)params);
+		break;
 	case ESD_CHECK_CMP:
 		return mtk_dsi_esd_cmp(comp, handle, params);
+<<<<<<< HEAD
 	#ifdef OPLUS_BUG_STABILITY
 	case DSI_READ:
 		mtk_dsi_dcs_read_reg_v1(comp, handle, (char *)params);
 		break;
 	#endif
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	case LCM_HBM:
 	{
 		struct mtk_dsi *dsi =
@@ -5436,17 +5789,56 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 		if (panel_ext && panel_ext->funcs
 			&& panel_ext->funcs->set_hbm)
 			//#ifndef OPLUS_BUG_STABILITY
+<<<<<<< HEAD
 			/*
 			panel_ext->funcs->set_hbm(dsi,
+=======
+			/*panel_ext->funcs->set_hbm(dsi,
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 					mipi_dsi_dcs_write_gce,
 					handle, *(int *)params);*/
 			//#else
 			panel_ext->funcs->set_hbm(dsi,
+<<<<<<< HEAD
 			                mipi_dsi_dcs_write_gce_hs,
 			                handle, *(int *)params);
 			//#endif
 	}
 		break;
+=======
+					mipi_dsi_dcs_write_gce_hs,
+					handle, *(int *)params);
+			//#endif
+	}
+		break;
+	#ifdef OPLUS_BUG_STABILITY
+	case DC_BACKLIGHT:
+	{
+		struct mtk_dsi *dsi =
+			container_of(comp, struct mtk_dsi, ddp_comp);
+
+		panel_ext = mtk_dsi_get_panel_ext(comp);
+		if (panel_ext && panel_ext->funcs
+			&& panel_ext->funcs->set_dc_backlight){
+			panel_ext->funcs->set_dc_backlight(dsi,
+					mipi_dsi_dcs_write_gce,
+					handle, *(int *)params);
+		}
+	}
+		break;
+	#endif /* OPLUS_BUG_STABILITY */
+	case PANEL_SN_SET:
+	{
+		panel_ext = mtk_dsi_get_panel_ext(comp);
+		if (!(panel_ext && panel_ext->funcs &&
+		      panel_ext->funcs->sn_set))
+			break;
+
+		//#ifdef OPLUS_FEATURE_SILENCEMODE
+		panel_ext->funcs->sn_set(dsi->panel);
+		break;
+	}
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	case CONNECTOR_READ_EPILOG:
 		mtk_dsi_clear_rxrd_irq(dsi);
 		break;
@@ -5595,29 +5987,48 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 		break;
 	case DSI_SET_BL:
 	{
+<<<<<<< HEAD
 		#ifdef OPLUS_BUG_STABILITY
 		int backlight = *(int *)params;
 		bool hbm_en = false;
 		#endif
+=======
+		//#ifdef OPLUS_FEATURE_HBM
+		int backlight = *(int *)params;
+		bool hbm_en = false;
+		//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 		struct mtk_dsi *dsi =
 			container_of(comp, struct mtk_dsi, ddp_comp);
 
 
 		panel_ext = mtk_dsi_get_panel_ext(comp);
+<<<<<<< HEAD
 		#ifndef OPLUS_BUG_STABILITY
+=======
+		//#ifndef OPLUS_FEATURE_SILENCEMODE
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		/*if (panel_ext && panel_ext->funcs
 			&& panel_ext->funcs->set_backlight_cmdq)
 			panel_ext->funcs->set_backlight_cmdq(dsi,
 					mipi_dsi_dcs_write_gce,
 					handle, *(int *)params);*/
+<<<<<<< HEAD
 		#else
+=======
+		//else
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		if (panel_ext && panel_ext->funcs
 			&& panel_ext->funcs->set_backlight_cmdq) {
 			if (panel_ext->funcs->hbm_get_state)
 				panel_ext->funcs->hbm_get_state(dsi->panel, &hbm_en);
 
+<<<<<<< HEAD
 			DDPINFO("DSI_SET_BL: hbm_en=%d, backlight=%d\n", hbm_en, backlight);
+=======
+			DDPDBG("DSI_SET_BL: hbm_en=%d, backlight=%d\n", hbm_en, backlight);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 			//make sure it could not set backlight when fp works
 			if (hbm_en == false) {
 				if (silence_mode) {
@@ -5627,6 +6038,7 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 						handle, 0);
 				}else{
 					silence_flag = 0;
+<<<<<<< HEAD
 					/*begin add for 91 register te sequence*/
 					if (panel_ext && panel_ext->funcs
 						&& panel_ext->funcs->set_global_hbm1
@@ -5662,6 +6074,8 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 					}
 					/*end add for 91 register te sequence*/
 
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 					panel_ext->funcs->set_backlight_cmdq(dsi,
 						mipi_dsi_dcs_write_gce_hs,
 						handle, *(int *)params);
@@ -5672,8 +6086,12 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 				DDPPR_ERR("%s: hbm_en is true, backlight change is forbidden\n", __func__);
 			}
 		}
+<<<<<<< HEAD
 		oplus_last_backlight = backlight;
 		#endif
+=======
+		//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	}
 		break;
 	case DSI_SET_BL_AOD:
@@ -5684,6 +6102,7 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 		panel_ext = mtk_dsi_get_panel_ext(comp);
 		if (panel_ext && panel_ext->funcs
 			&& panel_ext->funcs->set_aod_light_mode)
+<<<<<<< HEAD
 			#ifndef OPLUS_BUG_STABILITY
 			/*panel_ext->funcs->set_aod_light_mode(dsi,
 					mipi_dsi_dcs_write_gce,
@@ -5706,7 +6125,17 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 			&& panel_ext->funcs->set_seed)
 			panel_ext->funcs->set_seed(dsi,
 					mipi_dsi_dcs_write_gce_hs,
+=======
+			//#ifndef OPLUS_BUG_STABILITY
+			/*panel_ext->funcs->set_aod_light_mode(dsi,
+					mipi_dsi_dcs_write_gce,
+					handle, *(unsigned int *)params);*/
+			//#else
+			panel_ext->funcs->set_aod_light_mode(dsi,
+					mipi_dsi_dcs_write_gce_hs,
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 					handle, *(unsigned int *)params);
+			//#endif
 	}
 		break;
 	//#endif
@@ -5725,6 +6154,21 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 					handle, *(int *)params);
 	}
 		break;
+	//#ifdef OPLUS_FEATURE_SEED
+	case LCM_SEED:
+	{
+		struct mtk_dsi *dsi =
+			container_of(comp, struct mtk_dsi, ddp_comp);
+
+		panel_ext = mtk_dsi_get_panel_ext(comp);
+		if (panel_ext && panel_ext->funcs
+			&& panel_ext->funcs->set_seed)
+			panel_ext->funcs->set_seed(dsi,
+					mipi_dsi_dcs_write_gce_hs,
+					handle, *(unsigned int *)params);
+	}
+		break;
+	//#endif
 	case DSI_HBM_SET:
 	{
 		#ifdef OPLUS_BUG_STABILITY
@@ -5736,6 +6180,7 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 		      panel_ext->funcs->hbm_set_cmdq))
 			break;
 
+<<<<<<< HEAD
 		#ifdef OPLUS_BUG_STABILITY
 		if (silence_mode || silence_flag) {
 			printk("%s silence_mode is %ld, don not set hbm\n",__func__, silence_mode);
@@ -5789,6 +6234,24 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 		/*end add .after set finger hbm off,set backlight*/
 		#endif
 
+=======
+		//#ifdef OPLUS_FEATURE_SILENCEMODE
+		if (silence_mode || silence_flag) {
+		      printk("%s silence_mode is %ld, don not set hbm\n",__func__, silence_mode);
+		      break;
+		}
+		//#endif
+
+		//#ifndef OPLUS_BUG_STABILITY
+		/*panel_ext->funcs->hbm_set_cmdq(dsi->panel, dsi,
+					       mipi_dsi_dcs_write_gce, handle,
+					       *(bool *)params);*/
+		//#else
+		panel_ext->funcs->hbm_set_cmdq(dsi->panel, dsi,
+					       mipi_dsi_dcs_write_gce_hs, handle,
+					       *(bool *)params);
+		//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		break;
 	}
 	case DSI_HBM_GET_STATE:
@@ -5896,7 +6359,7 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 		panel_ext = mtk_dsi_get_panel_ext(comp);
 		if (dsi->ext && dsi->ext->funcs
 			&& dsi->ext->funcs->doze_get_mode_flags) {
-
+			DDPINFO("%s DSI_CHANGE_MODE,mode=%d\n", __func__,*aod_en);
 			dsi->mode_flags =
 				dsi->ext->funcs->doze_get_mode_flags(
 					dsi->panel, *aod_en);
@@ -5915,15 +6378,26 @@ static int mtk_dsi_io_cmd(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 	/*#ifdef OPLUS_BUG_STABILITY*/
 	case PANEL_OSC_HOPPING:
 	{
+<<<<<<< HEAD
 		struct mtk_dsi *dsi =
 			container_of(comp, struct mtk_dsi, ddp_comp);
+=======
+                struct mtk_dsi *dsi =
+                        container_of(comp, struct mtk_dsi, ddp_comp);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 		panel_ext = mtk_dsi_get_panel_ext(comp);
 
 		if (dsi->ext && dsi->ext->funcs
+<<<<<<< HEAD
 			&& dsi->ext->funcs->lcm_osc_freq_change) {
 			DDPINFO("%s cabc_switch\n", __func__);
 			dsi->ext->funcs->lcm_osc_freq_change(dsi,mipi_dsi_dcs_write_gce,handle,*(int *)params);
+=======
+			&& dsi->ext->funcs->lcm_osc_change) {
+			DDPINFO("%s cabc_switch\n", __func__);
+			dsi->ext->funcs->lcm_osc_change(dsi,mipi_dsi_dcs_write_gce,handle,*(int *)params);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		}
 	}
 		break;

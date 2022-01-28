@@ -1,11 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_panel.c
 ** Description : oplus display panel char dev  /dev/oplus_panel
 ** Version : 1.0
 ** Date : 2020/06/13
+<<<<<<< HEAD
 ** Author : Li.Sheng@MULTIMEDIA.DISPLAY.LCD
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 **
 ** ------------------------------- Revision History: -----------
 **  <author>        <data>        <version >        <desc>
@@ -22,7 +28,10 @@
 extern int oplus_display_panel_set_pwr(void *buf);
 extern int oplus_display_panel_get_pwr(void *buf);
 extern int oplus_display_panel_get_max_brightness(void *buf);
+<<<<<<< HEAD
 extern int oplus_display_panel_get_oplus_max_brightness(void *buf);
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 extern int oplus_display_panel_get_serial_number(void *buf);
 extern int oplus_display_panel_set_hbm(void *buf);
 extern int oplus_display_panel_get_hbm(void *buf);
@@ -45,8 +54,11 @@ extern int oplus_display_set_mtk_loglevel(void *buf);
 extern int oplus_display_panel_get_vendor(void *buf);
 extern int oplus_display_panel_set_seed(void *buf);
 extern int oplus_display_panel_get_seed(void *buf);
+<<<<<<< HEAD
 extern int oplus_panel_set_aod_light_mode(void *buf);
 extern int oplus_panel_get_aod_light_mode(void *buf);
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 static const struct panel_ioctl_desc panel_ioctls[] = {
 	PANEL_IOCTL_DEF(PANEL_IOCTL_SET_POWER, oplus_display_panel_set_pwr),
@@ -56,9 +68,15 @@ static const struct panel_ioctl_desc panel_ioctls[] = {
 	/*PANEL_IOCTL_DEF(PANEL_IOCTL_GET_PANELID, oplus_display_panel_get_id),
 	PANEL_IOCTL_DEF(PANEL_IOCTL_SET_FFL, oplus_display_panel_set_ffl),
 	PANEL_IOCTL_DEF(PANEL_IOCTL_GET_FFL, oplus_display_panel_get_ffl),
+<<<<<<< HEAD
 	PANEL_IOCTL_DEF(PANEL_IOCTL_SET_MAX_BRIGHTNESS, oplus_display_panel_set_max_brightness),*/
 	PANEL_IOCTL_DEF(PANEL_IOCTL_SET_AOD, oplus_panel_set_aod_light_mode),
 	PANEL_IOCTL_DEF(PANEL_IOCTL_GET_AOD, oplus_panel_get_aod_light_mode),
+=======
+	PANEL_IOCTL_DEF(PANEL_IOCTL_SET_AOD, oplus_panel_set_aod_light_mode),
+	PANEL_IOCTL_DEF(PANEL_IOCTL_GET_AOD, oplus_panel_get_aod_light_mode),
+	PANEL_IOCTL_DEF(PANEL_IOCTL_SET_MAX_BRIGHTNESS, oplus_display_panel_set_max_brightness),*/
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	PANEL_IOCTL_DEF(PANEL_IOCTL_GET_MAX_BRIGHTNESS, oplus_display_panel_get_max_brightness),
 	PANEL_IOCTL_DEF(PANEL_IOCTL_GET_PANELINFO, oplus_display_panel_get_vendor),
 	/*PANEL_IOCTL_DEF(PANEL_IOCTL_GET_CCD, oplus_display_panel_get_ccd_check),*/
@@ -94,10 +112,16 @@ static const struct panel_ioctl_desc panel_ioctls[] = {
 	PANEL_IOCTL_DEF(PANEL_IOCTL_SET_LCM_CABC, oplus_display_panel_set_cabc),
 	PANEL_IOCTL_DEF(PANEL_IOCTL_GET_LCM_CABC, oplus_display_panel_get_cabc),
 	PANEL_IOCTL_DEF(PANEL_IOCTL_SET_FINGER_PRINT, oplus_display_panel_set_finger_print),
+<<<<<<< HEAD
 	/*PANEL_IOCTL_DEF(PANEL_IOCTL_SET_ESD, oplus_display_panel_set_esd),*/
 	PANEL_IOCTL_DEF(PANEL_IOCTL_GET_ESD, oplus_display_panel_get_esd),
 	PANEL_IOCTL_DEF(PANEL_IOCTL_SET_MTK_LOG_LEVEL, oplus_display_set_mtk_loglevel),
 	PANEL_IOCTL_DEF(PANEL_IOCTL_GET_OPLUS_MAXBRIGHTNESS, oplus_display_panel_get_oplus_max_brightness),
+=======
+	PANEL_IOCTL_DEF(PANEL_IOCTL_SET_ESD, oplus_display_panel_set_esd),
+	PANEL_IOCTL_DEF(PANEL_IOCTL_GET_ESD, oplus_display_panel_get_esd),
+	PANEL_IOCTL_DEF(PANEL_IOCTL_SET_MTK_LOG_LEVEL, oplus_display_set_mtk_loglevel),
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 };
 
 static int panel_open(struct inode *inode, struct file *filp)
@@ -159,7 +183,11 @@ long panel_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	}
 	ksize = max(max(in_size, out_size), drv_size);
 
+<<<<<<< HEAD
 	/*pr_err("%s pid = %d, cmd = %s\n", __func__, task_pid_nr(current), ioctl->name);*/
+=======
+	pr_debug("%s pid = %d, cmd = %s\n", __func__, task_pid_nr(current), ioctl->name);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 	if (ksize <= sizeof(static_data)) {
 		kdata = static_data;
@@ -261,7 +289,11 @@ err_class_create:
 	return rc;
 }
 
+<<<<<<< HEAD
 void __exit oplus_display_panel_exit(void)
+=======
+void __exit oplus_display_panel_exit()
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 {
 	pr_err("%s\n", __func__);
 
@@ -275,6 +307,7 @@ module_init(oplus_display_panel_init);
 module_exit(oplus_display_panel_exit);
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("Lisheng <lisheng1@oplus.com>");
+<<<<<<< HEAD
 =======
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
@@ -548,3 +581,5 @@ module_exit(oplus_display_panel_exit);
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("Lisheng <lisheng1@oplus.com>");
 >>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)

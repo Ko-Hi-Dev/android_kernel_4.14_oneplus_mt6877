@@ -1,11 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_dc.c
 ** Description : oplus dc feature
 ** Version : 1.0
 ** Date : 2020/07/1
+<<<<<<< HEAD
 ** Author : JianBin.Zhang@MM.Display.LCD Driver
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 **
 ** ------------------------------- Revision History: -----------
 **  <author>        <data>        <version >        <desc>
@@ -81,6 +87,7 @@ int oplus_display_panel_set_dim_dc_alpha(void *buf)
 }
 
 
+<<<<<<< HEAD
 =======
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
@@ -164,3 +171,5 @@ int oplus_display_panel_set_dim_dc_alpha(void *buf)
 
 
 >>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)

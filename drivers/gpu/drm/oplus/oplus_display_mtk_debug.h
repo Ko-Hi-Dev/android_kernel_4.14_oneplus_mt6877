@@ -1,11 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_mtk_debug.h
 ** Description : oplus display mtk debug
 ** Version : 1.0
 ** Date : 2020/06/13
+<<<<<<< HEAD
 ** Author : Xiaolei.Gao@MULTIMEDIA.DISPLAY.LCD
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 **
 ** ------------------------------- Revision History: -----------
 **  <author>        <data>        <version >        <desc>
@@ -32,6 +38,7 @@ enum {
 };
 
 #endif /*_OPLUS_DISPLAY_MTK_DEBUG_H_*/
+<<<<<<< HEAD
 =======
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
@@ -66,3 +73,5 @@ enum {
 
 #endif /*_OPLUS_DISPLAY_MTK_DEBUG_H_*/
 >>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)

@@ -27,6 +27,21 @@
 #include "mtk_disp_color.h"
 #include "mtk_log.h"
 #include "mtk_dump.h"
+<<<<<<< HEAD
+=======
+#include "mtk_drm_helper.h"
+#include "mtk_drm_trace.h"
+
+#ifdef CONFIG_LEDS_MTK_DISP
+#include <mtk_leds_drv.h>
+#include <leds-mtk-disp.h>
+#elif defined CONFIG_LEDS_MTK_PWM
+#include <mtk_leds_drv.h>
+#include <leds-mtk-pwm.h>
+#else
+#define mt_leds_brightness_set(x, y) do { } while (0)
+#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 #define DISP_REG_CCORR_EN (0x000)
 #define DISP_REG_CCORR_INTEN                     (0x008)
@@ -49,7 +64,12 @@
 #define CCORR_CLIP(val, min, max) ((val >= max) ? \
 	max : ((val <= min) ? min : val))
 
+extern unsigned long oplus_display_brightness;
+
 static unsigned int g_ccorr_relay_value[DISP_CCORR_TOTAL];
+static unsigned int g_reg_ccorr_inten_value;
+
+unsigned int g_faker_backlight;
 #define index_of_ccorr(module) ((module == DDP_COMPONENT_CCORR0) ? 0 : 1)
 
 //static bool bypass_color;
@@ -81,6 +101,7 @@ static atomic_t g_ccorr_get_irq = ATOMIC_INIT(0);
 
 /* FOR TRANSITION */
 static DEFINE_SPINLOCK(g_pq_bl_change_lock);
+static int g_old_pq_backlight;
 static int g_pq_backlight;
 static int g_pq_backlight_db;
 static atomic_t g_ccorr_is_init_valid = ATOMIC_INIT(0);
@@ -95,6 +116,10 @@ static bool need_offset;
 
 // It's a work around for no comp assigned in functions.
 static struct mtk_ddp_comp *default_comp;
+<<<<<<< HEAD
+=======
+static struct mtk_ddp_comp *ccorr1_default_comp;
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 static int disp_ccorr_write_coef_reg(struct mtk_ddp_comp *comp,
 	struct cmdq_pkt *handle, int lock);
@@ -142,7 +167,7 @@ static void disp_ccorr_multiply_3x3(unsigned int ccorrCoef[3][3],
 	}
 
 	for (i = 0; i < 3; i += 1) {
-		DDPINFO("signedCcorrCoef[%d][0-2] = {%d, %d, %d}\n", i,
+		DDPDBG("signedCcorrCoef[%d][0-2] = {%d, %d, %d}\n", i,
 			signedCcorrCoef[i][0],
 			signedCcorrCoef[i][1],
 			signedCcorrCoef[i][2]);
@@ -194,7 +219,7 @@ static void disp_ccorr_multiply_3x3(unsigned int ccorrCoef[3][3],
 	resultCoef[2][2] = CCORR_CLIP(temp_Result, -2048, 2047) & 0xFFF;
 
 	for (i = 0; i < 3; i += 1) {
-		DDPINFO("resultCoef[%d][0-2] = {0x%x, 0x%x, 0x%x}\n", i,
+		DDPDBG("resultCoef[%d][0-2] = {0x%x, 0x%x, 0x%x}\n", i,
 			resultCoef[i][0],
 			resultCoef[i][1],
 			resultCoef[i][2]);
@@ -344,6 +369,7 @@ void disp_ccorr_on_end_of_frame(struct mtk_ddp_comp *comp)
 			return;
 		}
 		intsta = readl(comp->regs + DISP_REG_CCORR_INTSTA);
+
 		DDPINFO("%s: intsta: 0x%x", __func__, intsta);
 
 		if (intsta & 0x2) {	/* End of frame */
@@ -351,9 +377,11 @@ void disp_ccorr_on_end_of_frame(struct mtk_ddp_comp *comp)
 			writel(intsta & ~0x3, comp->regs
 				+ DISP_REG_CCORR_INTSTA);
 
-			atomic_set(&g_ccorr_get_irq, 1);
-
-			wake_up_interruptible(&g_ccorr_get_irq_wq);
+			if (index == 0) {
+				atomic_set(&g_ccorr_get_irq, 1);
+				DDPPR_ERR("%s: wakeup get_irq_wq\n", __func__);
+				wake_up_interruptible(&g_ccorr_get_irq_wq);
+			}
 		}
 		DDPDBG("%s @ %d......... [IRQ] spin_unlock_irqrestore ++ ",
 			__func__, __LINE__);
@@ -372,9 +400,17 @@ static void disp_ccorr_set_interrupt(struct mtk_ddp_comp *comp,
 	if (default_comp == NULL)
 		default_comp = comp;
 
-	mtk_crtc_user_cmd(&(comp->mtk_crtc->base), comp,
-		SET_INTERRUPT, &enabled);
-
+	if (enabled && (g_reg_ccorr_inten_value & 0x2))
+		return;
+	else if (!enabled && !(g_reg_ccorr_inten_value & 0x2))
+		return;
+	else {
+		if (!enabled && (g_old_pq_backlight != g_pq_backlight))
+			g_old_pq_backlight = g_pq_backlight;
+		else
+			mtk_crtc_user_cmd(&(comp->mtk_crtc->base), comp,
+				SET_INTERRUPT, &enabled);
+	}
 }
 
 static void disp_ccorr_clear_irq_only(struct mtk_ddp_comp *comp)
@@ -433,6 +469,7 @@ static void disp_ccorr_clear_irq_only(struct mtk_ddp_comp *comp)
 		{
 			/* Disable output frame end interrupt */
 			writel(0x0, comp->regs + DISP_REG_CCORR_INTEN);
+			g_reg_ccorr_inten_value = 0x0;
 			DDPINFO("%s: Interrupt disabled\n", __func__);
 		}
 			spin_unlock_irqrestore(&g_ccorr_clock_lock, flags);
@@ -498,27 +535,38 @@ static int disp_pq_copy_backlight_to_user(int *backlight)
 void disp_pq_notify_backlight_changed(int bl_1024)
 {
 	unsigned long flags;
-	int old_bl;
 
 	spin_lock_irqsave(&g_pq_bl_change_lock, flags);
-	old_bl = g_pq_backlight;
+	g_old_pq_backlight = g_pq_backlight;
 	g_pq_backlight = bl_1024;
 	spin_unlock_irqrestore(&g_pq_bl_change_lock, flags);
 
 	if (atomic_read(&g_ccorr_is_init_valid) != 1)
 		return;
 
-	DDPINFO("%s: %d\n", __func__, bl_1024);
+	DDPPR_ERR("%s: %d,irqen=%d,old_bl=%d,pq_bl=%d\n", __func__, bl_1024, 
+		g_reg_ccorr_inten_value, g_old_pq_backlight, g_pq_backlight);
 
-	if (default_comp != NULL && (old_bl == 0 || bl_1024 == 0)) {
-		disp_ccorr_set_interrupt(default_comp, 1);
+	if (m_new_pq_persist_property[DISP_PQ_SILKY_BRIGHTNESS]) {
+		DDPDBG("%s: SILKY_BRIGHTNESS OPEN\n", __func__);
+		if (default_comp != NULL) {
+			disp_ccorr_set_interrupt(default_comp, 1);
 
-		if (default_comp != NULL &&
-				default_comp->mtk_crtc != NULL)
-			mtk_crtc_check_trigger(default_comp->mtk_crtc, false,
-				true);
+			if (default_comp != NULL && default_comp->mtk_crtc != NULL)
+				mtk_crtc_check_trigger(default_comp->mtk_crtc, false, true);
 
-		DDPINFO("%s: trigger refresh when backlight ON/Off", __func__);
+			DDPINFO("%s: trigger refresh when backlight changed", __func__);
+		}
+	} else {
+		DDPDBG("%s: SILKY_BRIGHTNESS CLOSE\n", __func__);
+		if (default_comp != NULL && (g_old_pq_backlight == 0 || bl_1024 == 0)) {
+			disp_ccorr_set_interrupt(default_comp, 1);
+
+			if (default_comp != NULL && default_comp->mtk_crtc != NULL)
+				mtk_crtc_check_trigger(default_comp->mtk_crtc, false, true);
+
+			DDPINFO("%s: trigger refresh when backlight ON/Off", __func__);
+		}
 	}
 }
 
@@ -590,6 +638,50 @@ static int disp_ccorr_set_coef(
 	return ret;
 }
 
+<<<<<<< HEAD
+=======
+static int mtk_disp_ccorr_set_interrupt(struct mtk_ddp_comp *comp, void *data)
+{
+	int enabled = *((int *)data);
+	unsigned long flags;
+	int index = index_of_ccorr(comp->id);
+	int ret = 0;
+
+	DDPDBG("%s @ %d......... spin_lock_irqsave ++ %d\n", __func__, __LINE__, index);
+	spin_lock_irqsave(&g_ccorr_clock_lock, flags);
+	DDPDBG("%s @ %d......... spin_lock_irqsave -- ",
+		__func__, __LINE__);
+	if (atomic_read(&g_ccorr_is_clock_on[index]) != 1) {
+		DDPINFO("%s: clock is off. enabled:%d\n",
+			__func__, enabled);
+
+		spin_unlock_irqrestore(&g_ccorr_clock_lock, flags);
+		DDPDBG("%s @ %d......... spin_unlock_irqrestore -- ",
+			__func__, __LINE__);
+		return ret;
+	}
+
+	if (enabled || g_old_pq_backlight != g_pq_backlight) {
+		if (readl(comp->regs + DISP_REG_CCORR_EN) == 0) {
+			/* Print error message */
+			DDPINFO("[WARNING] DISP_REG_CCORR_EN not enabled!\n");
+		}
+		/* Enable output frame end interrupt */
+		writel(0x2, comp->regs + DISP_REG_CCORR_INTEN);
+		g_reg_ccorr_inten_value = 0x2;
+		DDPINFO("%s: Interrupt enabled\n", __func__);
+	} else {
+		/* Disable output frame end interrupt */
+		writel(0x0, comp->regs + DISP_REG_CCORR_INTEN);
+		g_reg_ccorr_inten_value = 0x0;
+		DDPINFO("%s: Interrupt disabled\n", __func__);
+	}
+	spin_unlock_irqrestore(&g_ccorr_clock_lock, flags);
+	DDPDBG("%s @ %d......... spin_unlock_irqrestore -- ",
+		__func__, __LINE__);
+	return ret;
+}
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 int disp_ccorr_set_color_matrix(struct mtk_ddp_comp *comp,
 	struct cmdq_pkt *handle, int32_t matrix[16], int32_t hint, bool fte_flag)
 {
@@ -738,7 +830,29 @@ int mtk_drm_ioctl_set_ccorr(struct drm_device *dev, void *data,
 	struct mtk_ddp_comp *comp = private->ddp_comp[DDP_COMPONENT_CCORR0];
 	struct drm_crtc *crtc = private->crtc[0];
 
-	return mtk_crtc_user_cmd(crtc, comp, SET_CCORR, data);
+	if (m_new_pq_persist_property[DISP_PQ_SILKY_BRIGHTNESS]) {
+		int ret;
+		struct DRM_DISP_CCORR_COEF_T *ccorr_config = data;
+
+		ret = mtk_crtc_user_cmd(crtc, comp, SET_CCORR, data);
+		DDPDBG("%s: SILKY_BRIGHTNESS OPEN,silky_bright_flag=%d,FinalBacklight=%d\n", 
+			__func__, ccorr_config->silky_bright_flag, ccorr_config->FinalBacklight);
+		if ((ccorr_config->silky_bright_flag) == 1 &&
+			ccorr_config->FinalBacklight != 0) {
+			DDPINFO("brightness = %d, silky_bright_flag = %d",
+				ccorr_config->FinalBacklight,
+				ccorr_config->silky_bright_flag);
+			oplus_display_brightness = ccorr_config->FinalBacklight;
+			mt_leds_brightness_set("lcd-backlight",
+						ccorr_config->FinalBacklight);
+		}
+		mtk_crtc_check_trigger(comp->mtk_crtc, false, false);
+
+		return ret;
+	} else {
+		DDPDBG("%s: SILKY_BRIGHTNESS CLOSE\n", __func__);
+		return mtk_crtc_user_cmd(crtc, comp, SET_CCORR, data);
+	}
 }
 
 int mtk_drm_ioctl_ccorr_eventctl(struct drm_device *dev, void *data,
@@ -750,10 +864,12 @@ int mtk_drm_ioctl_ccorr_eventctl(struct drm_device *dev, void *data,
 	/* TODO: dual pipe */
 	int *enabled = data;
 
-	if (enabled)
+	if (enabled || g_old_pq_backlight != g_pq_backlight)
 		mtk_crtc_check_trigger(comp->mtk_crtc, false, true);
 
 	//mtk_crtc_user_cmd(crtc, comp, EVENTCTL, data);
+	DDPPR_ERR("ccorr_eventctl, enabled=%d,g_reg_ccorr_inten_value=%d,old_bl=%d,pq_bl=%d\n", 
+		*enabled,g_reg_ccorr_inten_value,g_old_pq_backlight, g_pq_backlight);
 	disp_ccorr_set_interrupt(comp, *enabled);
 
 	return ret;
@@ -767,7 +883,6 @@ int mtk_drm_ioctl_ccorr_get_irq(struct drm_device *dev, void *data,
 	atomic_set(&g_ccorr_is_init_valid, 1);
 
 	disp_ccorr_wait_irq(dev, 60);
-
 	if (disp_pq_copy_backlight_to_user((int *) data) < 0) {
 		DDPPR_ERR("%s: failed", __func__);
 		ret = -EFAULT;
@@ -854,10 +969,19 @@ static void mtk_ccorr_start(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle)
 static void mtk_ccorr_bypass(struct mtk_ddp_comp *comp, int bypass,
 	struct cmdq_pkt *handle)
 {
+<<<<<<< HEAD
 	DDPINFO("%s\n", __func__);
 	cmdq_pkt_write(handle, comp->cmdq_base,
 		       comp->regs_pa + DISP_REG_CCORR_CFG, bypass, 0x1);
 	g_ccorr_relay_value[index_of_ccorr(comp->id)] = bypass;
+=======
+	if (g_ccorr_relay_value[index_of_ccorr(comp->id)] != bypass) {
+		DDPINFO("%s\n", __func__);
+		cmdq_pkt_write(handle, comp->cmdq_base,
+			       comp->regs_pa + DISP_REG_CCORR_CFG, bypass, 0x1);
+		g_ccorr_relay_value[index_of_ccorr(comp->id)] = bypass;
+	}
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 }
 
 static int mtk_ccorr_user_cmd(struct mtk_ddp_comp *comp,
@@ -874,6 +998,21 @@ static int mtk_ccorr_user_cmd(struct mtk_ddp_comp *comp,
 			DDPPR_ERR("DISP_IOCTL_SET_CCORR: failed\n");
 			return -EFAULT;
 		}
+<<<<<<< HEAD
+=======
+		if (comp->mtk_crtc->is_dual_pipe) {
+			struct mtk_drm_crtc *mtk_crtc = comp->mtk_crtc;
+			struct drm_crtc *crtc = &mtk_crtc->base;
+			struct mtk_drm_private *priv = crtc->dev->dev_private;
+			struct mtk_ddp_comp *comp_ccorr1 = priv->ddp_comp[DDP_COMPONENT_CCORR1];
+
+			if (disp_ccorr_set_coef(config, comp_ccorr1, handle) < 0) {
+				DDPPR_ERR("DISP_IOCTL_SET_CCORR: failed\n");
+				return -EFAULT;
+			}
+		}
+
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	}
 	break;
 
@@ -915,6 +1054,14 @@ static int mtk_ccorr_user_cmd(struct mtk_ddp_comp *comp,
 		DDPDBG("%s @ %d......... spin_unlock_irqrestore -- ",
 			__func__, __LINE__);
 
+	}
+	break;
+
+	case BYPASS_CCORR:
+	{
+		int *value = data;
+
+		mtk_ccorr_bypass(comp, *value, handle);
 	}
 	break;
 
@@ -1078,6 +1225,11 @@ static int mtk_disp_ccorr_probe(struct platform_device *pdev)
 
 	if (!default_comp && comp_id == DDP_COMPONENT_CCORR0)
 		default_comp = &priv->ddp_comp;
+<<<<<<< HEAD
+=======
+	if (!ccorr1_default_comp && comp_id == DDP_COMPONENT_CCORR1)
+    ccorr1_default_comp = &priv->ddp_comp;
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 	ret = mtk_ddp_comp_init(dev, dev->of_node, &priv->ddp_comp, comp_id,
 				&mtk_disp_ccorr_funcs);
@@ -1169,6 +1321,14 @@ void disp_ccorr_set_bypass(struct drm_crtc *crtc, int bypass)
 {
 	int ret;
 
+<<<<<<< HEAD
 	ret = mtk_crtc_user_cmd(crtc, default_comp, BYPASS_CCORR, &bypass);
+=======
+	if (g_ccorr_relay_value[index_of_ccorr(default_comp->id)] == bypass)
+		return;
+	ret = mtk_crtc_user_cmd(crtc, default_comp, BYPASS_CCORR, &bypass);
+	if (default_comp->mtk_crtc->is_dual_pipe)
+		ret = mtk_crtc_user_cmd(crtc, ccorr1_default_comp, BYPASS_CCORR, &bypass);
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	DDPFUNC("ret = %d", ret);
 }

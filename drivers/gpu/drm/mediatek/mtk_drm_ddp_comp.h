@@ -242,10 +242,22 @@ enum mtk_ddp_io_cmd {
 	DSI_LFR_SET,
 	DSI_LFR_UPDATE,
 	DSI_LFR_STATUS_CHECK,
+<<<<<<< HEAD
 	DSI_READ,
 	LCM_HBM,
 	LCM_CABC,
 	LCM_SEED,
+=======
+	WDMA_WRITE_DST_ADDR0,
+	WDMA_READ_DST_SIZE,
+	DSI_READ,
+	LCM_HBM,
+	LCM_CABC,
+	DC_BACKLIGHT,
+	LCM_SEED,
+	PANEL_SN_SET,
+	//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 };
 
 struct golden_setting_context {

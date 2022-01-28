@@ -112,7 +112,11 @@ enum DISP_PMQOS_SLOT {
 #define DISP_SLOT_READ_DDIC_BASE_END		\
 	(DISP_SLOT_READ_DDIC_BASE + READ_DDIC_SLOT_NUM * 0x4)
 //#ifdef OPLUS_FEATURE_ONSCREENFINGERPRINT
+<<<<<<< HEAD
 #define DISP_SLOT_FP0_IDX (DISP_SLOT_OVL_STATUS + 0x4)
+=======
+//#define DISP_SLOT_FP0_IDX (DISP_SLOT_OVL_STATUS + 0x4)
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 //#define DISP_SLOT_FP1_IDX (DISP_SLOT_FP0_IDX + 0x4)
 //#define DISP_SLOT_CUR_USER_CMD_IDX (DISP_SLOT_FP1_IDX + 0x4)
 //#else
@@ -800,6 +804,19 @@ void mtk_drm_send_lcm_cmd_flush(struct drm_crtc *crtc,
 //#endif
 
 int mtk_drm_crtc_wait_blank(struct mtk_drm_crtc *mtk_crtc);
+<<<<<<< HEAD
+=======
+void mtk_drm_crtc_init_para(struct drm_crtc *crtc);
+void mtk_drm_layer_dispatch_to_dual_pipe(
+	struct mtk_plane_state *plane_state,
+	struct mtk_plane_state *plane_state_l,
+	struct mtk_plane_state *plane_state_r,
+	unsigned int w);
+
+int mtk_drm_crtc_set_panel_hbm(struct drm_crtc *crtc, struct cmdq_pkt *cmdq_handle, bool en);
+int mtk_drm_crtc_hbm_wait(struct drm_crtc *crtc, bool en);
+
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /* ********************* Legacy DISP API *************************** */
 unsigned int DISP_GetScreenWidth(void);
 unsigned int DISP_GetScreenHeight(void);

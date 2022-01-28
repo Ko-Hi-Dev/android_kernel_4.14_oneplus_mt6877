@@ -776,7 +776,6 @@ static void mtk_ovl_config(struct mtk_ddp_comp *comp,
 
 	if (comp->mtk_crtc->is_dual_pipe) {
 		width = cfg->w / 2;
-		DDPMSG("\n");
 	} else
 		width = cfg->w;
 
@@ -1316,7 +1315,7 @@ static void _ovl_common_config(struct mtk_ddp_comp *comp, unsigned int idx,
 			size = buf_size;
 			regs_addr = comp->regs_pa +
 				DISP_REG_OVL_EL_ADDR(id);
-			if (state->pending.is_sec && pending->addr) {
+			if (state->pending.is_sec && pending->addr && (dst_h >= 1)) {
 				meta_type = CMDQ_IWC_H_2_MVA;
 				cmdq_sec_pkt_write_reg(handle, regs_addr,
 					pending->addr, meta_type,
@@ -1374,7 +1373,7 @@ static void _ovl_common_config(struct mtk_ddp_comp *comp, unsigned int idx,
 			size = buf_size;
 			regs_addr = comp->regs_pa +
 				DISP_REG_OVL_ADDR(ovl, lye_idx);
-			if (state->pending.is_sec && pending->addr) {
+			if (state->pending.is_sec && pending->addr && (dst_h >= 1)) {
 				meta_type = CMDQ_IWC_H_2_MVA;
 				cmdq_sec_pkt_write_reg(handle, regs_addr,
 					pending->addr, meta_type,
@@ -1763,7 +1762,7 @@ static bool compr_l_config_PVRIC_V3_1(struct mtk_ddp_comp *comp,
 
 			regs_addr = comp->regs_pa +
 				DISP_REG_OVL_EL_ADDR(id);
-			if (state->pending.is_sec && pending->addr) {
+			if (state->pending.is_sec && pending->addr && (dst_h >= 1)) {
 				size = buf_size;
 				meta_type = CMDQ_IWC_H_2_MVA;
 				cmdq_sec_pkt_write_reg(handle, regs_addr,
@@ -1818,7 +1817,7 @@ static bool compr_l_config_PVRIC_V3_1(struct mtk_ddp_comp *comp,
 
 			regs_addr = comp->regs_pa +
 				DISP_REG_OVL_ADDR(ovl, lye_idx);
-			if (state->pending.is_sec && pending->addr) {
+			if (state->pending.is_sec && pending->addr && (dst_h >= 1)) {
 				size = buf_size;
 				meta_type = CMDQ_IWC_H_2_MVA;
 				cmdq_sec_pkt_write_reg(handle, regs_addr,
@@ -2061,6 +2060,7 @@ static bool compr_l_config_AFBC_V1_2(struct mtk_ddp_comp *comp,
 			u32 size, meta_type;
 			u32 addr_offset;
 
+<<<<<<< HEAD
 			size = buf_size;
 			meta_type = CMDQ_IWC_H_2_MVA;
 			addr_offset = header_offset + tile_offset *
@@ -2075,6 +2075,16 @@ static bool compr_l_config_AFBC_V1_2(struct mtk_ddp_comp *comp,
 					size, 0);
 
 			cmdq_pkt_write(handle, comp->cmdq_base,
+=======
+			regs_addr = comp->regs_pa +
+				DISP_REG_OVL_EL_ADDR(id);
+			if (state->pending.is_sec && pending->addr && (dst_h >= 1)) {
+				size = buf_size;
+				meta_type = CMDQ_IWC_H_2_MVA;
+				cmdq_sec_pkt_write_reg(handle, regs_addr,
+					pending->addr, meta_type, 0, size, 0);
+				cmdq_pkt_write(handle, comp->cmdq_base,
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 					comp->regs_pa + OVL_SECURE,
 					BIT(id + EXT_SECURE_OFFSET),
 					BIT(id + EXT_SECURE_OFFSET));
@@ -2117,6 +2127,7 @@ static bool compr_l_config_AFBC_V1_2(struct mtk_ddp_comp *comp,
 	} else {
 		unsigned int regs_addr, hdr_addr;
 
+<<<<<<< HEAD
 		regs_addr = comp->regs_pa +
 			DISP_REG_OVL_ADDR(ovl, lye_idx);
 		hdr_addr = comp->regs_pa +
@@ -2138,6 +2149,16 @@ static bool compr_l_config_AFBC_V1_2(struct mtk_ddp_comp *comp,
 					pending->addr, meta_type, addr_offset,
 					size, 0);
 			cmdq_pkt_write(handle, comp->cmdq_base,
+=======
+			regs_addr = comp->regs_pa +
+				DISP_REG_OVL_ADDR(ovl, lye_idx);
+			if (state->pending.is_sec && pending->addr && (dst_h >= 1)) {
+				size = buf_size;
+				meta_type = CMDQ_IWC_H_2_MVA;
+				cmdq_sec_pkt_write_reg(handle, regs_addr,
+					pending->addr, meta_type, 0, size, 0);
+				cmdq_pkt_write(handle, comp->cmdq_base,
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 					comp->regs_pa + OVL_SECURE,
 					BIT(lye_idx), BIT(lye_idx));
 			DDPDBG("%s:%d, addr:%pad, size:%d\n",

@@ -262,12 +262,19 @@ static inline struct mtk_disp_rdma *comp_to_rdma(struct mtk_ddp_comp *comp)
 	return container_of(comp, struct mtk_disp_rdma, ddp_comp);
 }
 
+<<<<<<< HEAD
 #ifdef OPLUS_FEATURE_ONSCREENFINGERPRINT
 extern int frame_wait_num;
 extern int hbm_eof_flag;
 extern void fingerprint_send_notify(unsigned int fingerprint_op_mode);
 int fingerprint_delay_idx_num = 1;
 #endif
+=======
+//#ifdef OPLUS_FEATURE_ONSCREENFINGERPRINT
+extern int hbm_eof_flag;
+extern void fingerprint_send_notify(unsigned int fingerprint_op_mode);
+//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 static irqreturn_t mtk_disp_rdma_irq_handler(int irq, void *dev_id)
 {
 	struct mtk_disp_rdma *priv = dev_id;
@@ -310,6 +317,7 @@ static irqreturn_t mtk_disp_rdma_irq_handler(int irq, void *dev_id)
 		DDPIRQ("[IRQ] %s: reg update done!\n", mtk_dump_comp_str(rdma));
 
 	if (val & (1 << 2)) {
+<<<<<<< HEAD
 	    #ifdef OPLUS_FEATURE_ONSCREENFINGERPRINT
 		static unsigned int prev_fp_idx = 0;
 		unsigned int fp_idx = 0;
@@ -336,6 +344,24 @@ static irqreturn_t mtk_disp_rdma_irq_handler(int irq, void *dev_id)
 		}
         #endif
 #ifdef MTK_FB_MMDVFS_SUPPORT
+=======
+		//#ifdef OPLUS_FEATURE_ONSCREENFINGERPRINT
+		/*static unsigned int prev_fp_idx = 0;
+		unsigned int fp_idx = 0;
+		struct cmdq_pkt_buffer *qbuf = &rdma->mtk_crtc->gce_obj.buf;
+
+		fp_idx = *(unsigned int *)(qbuf->va_base + DISP_SLOT_FP1_IDX);
+		DDPPR_ERR("%s: prev_fp_idx:%u, fp_idx:%u\n", __func__,
+		       prev_fp_idx, fp_idx);
+		if (fp_idx > prev_fp_idx) {
+			prev_fp_idx = fp_idx;
+			//TODO: implement by customer
+			fingerprint_send_notify(1);
+			DDPPR_ERR("%s: send uiready to fp\n",__func__);
+		}*/
+
+		//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		set_swpm_disp_work(); /* counting fps for swpm */
 #endif
 		DDPIRQ("[IRQ] %s: frame done!\n", mtk_dump_comp_str(rdma));
@@ -352,14 +378,28 @@ static irqreturn_t mtk_disp_rdma_irq_handler(int irq, void *dev_id)
 	}
 
 	if (val & (1 << 1)) {
+<<<<<<< HEAD
 		DDPIRQ("[IRQ] %s: frame start!\n", mtk_dump_comp_str(rdma));
 		#ifdef OPLUS_FEATURE_ONSCREENFINGERPRINT
+=======
+		if (rdma->id == DDP_COMPONENT_RDMA0)
+			DRM_MMP_EVENT_START(rdma0, val, 0);
+		DDPINFO("[IRQ] %s: frame start!\n", mtk_dump_comp_str(rdma));
+		//#ifdef OPLUS_FEATURE_ONSCREENFINGERPRINT
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		if(hbm_eof_flag){
 			fingerprint_send_notify(0);
 			hbm_eof_flag = 0;
 		}
+<<<<<<< HEAD
 		#endif
 #ifdef MTK_DRM_DELAY_PRESENT_FENCE_SOF
+=======
+		//#endif
+		mtk_drm_refresh_tag_start(&priv->ddp_comp);
+		MMPathTraceDRM(rdma);
+
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		if (mtk_crtc) {
 			atomic_set(&mtk_crtc->pf_event, 1);
 			wake_up_interruptible(&mtk_crtc->present_fence_wq);
@@ -819,7 +859,6 @@ static void mtk_rdma_config(struct mtk_ddp_comp *comp,
 	//for dual pipe one layer
 	if (comp->mtk_crtc->is_dual_pipe) {
 		w = cfg->w / 2;
-		DDPFUNC();
 	} else
 		w = cfg->w;
 	cmdq_pkt_write(handle, comp->cmdq_base,

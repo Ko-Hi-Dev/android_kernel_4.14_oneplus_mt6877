@@ -45,11 +45,14 @@ obj-$(CONFIG_DRM_PANEL_HX_NT36682C_DPHY_VDO) += panel-hx-nt36682c-dphy-vdo.o
 obj-$(CONFIG_DRM_PANEL_TIANMA_NT36672C_VDO_120HZ) += panel-tianma-nt36672c-vdo-120hz.o
 obj-$(CONFIG_DRM_PANEL_TIANMA_NT36672C_VDO_144HZ) += panel-tianma-nt36672c-vdo-144hz.o
 obj-$(CONFIG_DRM_PANEL_OPLUS20075_SAMSUNG_DPHY_VDO) += panel-oplus20075_samsung_dsi_vdo_dphy.o
+<<<<<<< HEAD
 obj-$(CONFIG_DRM_PANEL_OPLUS20625_BOE_NT35625B_DPHY_VDO) += panel-oplus20625_boe_nt35625b3_vdo.o
 obj-$(CONFIG_DRM_PANEL_OPLUS20609_TIANMA_NT36672C_CPHY_VDO) += panel-oplus20609_tianma_nt36672c_cphy_vdo.o
 obj-$(CONFIG_DRM_PANEL_OPLUS20015_BOE_ILI9882N_DPHY_VDO) += panel-oplus20015_ili9882n_boe_dsi_vdo.o
 obj-$(CONFIG_DRM_PANEL_OPLUS20015_INNOLUX_ILI9882N_DPHY_VDO) += panel-oplus20015_ili9882n_innolux_dsi_vdo.o
 obj-$(CONFIG_DRM_PANEL_TIANMA_NT36672E_VDO_120HZ_HFP) += panel-tianma-nt36672e-vdo-120hz-hfp.o
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 obj-$(CONFIG_DRM_PANEL_K6853V1_64_ALPHA_VDO_01) += k6853v1_64_alpha/panel-k6853v1-64-alpha-vdo-01.o
 obj-$(CONFIG_DRM_PANEL_K6853V1_64_ALPHA_VDO_02) += k6853v1_64_alpha/panel-k6853v1-64-alpha-vdo-02.o
 obj-$(CONFIG_DRM_PANEL_K6853V1_64_ALPHA_VDO_02) += k6853v1_64_alpha/panel-k6853v1-64-alpha-vdo-03.o
@@ -73,10 +76,20 @@ obj-$(CONFIG_DRM_PANEL_SC_NT36672C_VDO_90HZ) += panel-sc-nt36672c-vdo-90hz.o
 obj-$(CONFIG_DRM_PANEL_SC_NT36672C_VDO_60HZ) += panel-sc-nt36672c-vdo-60hz.o
 obj-$(CONFIG_DRM_PANEL_SAMSUNG_S68FC01_VDO_AOD) += panel-samsung-s68fc01-vdo-aod.o
 obj-$(CONFIG_DRM_PANEL_OPLUS20131_BOE_NT37800_1080P_DSI_CMD) += oplus20131_boe_nt37800_1080p_dsi_cmd.o
+<<<<<<< HEAD
 obj-$(CONFIG_DRM_PANEL_OPLUS20181_SAMSUNG_AMS643YE01_1080P_DSI_CMD) += oplus20181_samsung_ams643ye01_1080p_dsi_cmd.o
 obj-$(CONFIG_DRM_PANEL_OPLUS21081_SAMSUNG_AMS643AG01_1080P_DSI_CMD) += oplus21081_samsung_ams643ag01_1080p_dsi_cmd.o
 obj-$(CONFIG_DRM_PANEL_OPLUS21851_SAMSUNG_AMS643AG01_1080P_DSI_CMD) += oplus21851_samsung_ams643ag01_1080p_dsi_cmd.o
 
+=======
+obj-$(CONFIG_DRM_PANEL_OPLUS20601_SAMSUNG_SOFE03F_M_1080P_DSI_CMD) += oplus20601_samsung_sofe03f_m_1080p_dsi_cmd.o
+obj-$(CONFIG_DRM_PANEL_OPLUS20615_SAMSUNG_AMS643YE01_1080P_DSI_CMD) += oplus20615_samsung_ams643ye01_1080p_dsi_cmd.o
+obj-$(CONFIG_DRM_PANEL_OPLUS20615_SAMSUNG_AMS643YE05_1080P_DSI_CMD) += oplus20615_samsung_ams643ye05_1080p_dsi_cmd.o
+obj-$(CONFIG_DRM_PANEL_OPLUS20131_TIANMA_NT37701_1080P_DSI_CMD) += oplus20131_tianma_nt37701_1080p_dsi_cmd.o
+obj-$(CONFIG_DRM_PANEL_OPLUS20171_BOE_NT37701_1080P_DSI_CMD) += oplus20171_boe_nt37701_1080p_dsi_cmd.o
+obj-$(CONFIG_DRM_PANEL_OPLUS20171_TIANMA_NT37701_42_1080P_DSI_CMD) += oplus20171_tianma_nt37701_42_1080p_dsi_cmd.o
+obj-$(CONFIG_DRM_PANEL_OPLUS20171_SAMSUNG_ANA6705_1080P_DSI_CMD) += oplus20171_samsung_ana6705_1080p_dsi_cmd.o
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 obj-$(CONFIG_DRM_PANEL_TRULY_FT8756_VDO) += panel-truly-ft8756-vdo.o
 obj-$(CONFIG_DRM_PANEL_TRULY_NT35595_CMD) += panel-truly-nt35595-cmd.o
 obj-$(CONFIG_DRM_PANEL_TRULY_NT35595_VDO) += panel-truly-nt35595-vdo.o

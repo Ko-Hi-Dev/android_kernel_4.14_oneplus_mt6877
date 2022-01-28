@@ -1,11 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_panel.h
 ** Description : oplus display panel char dev  /dev/oplus_panel
 ** Version : 1.0
 ** Date : 2020/06/13
+<<<<<<< HEAD
 ** Author : Li.Sheng@MULTIMEDIA.DISPLAY.LCD
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 **
 ** ------------------------------- Revision History: -----------
 **  <author>        <data>        <version >        <desc>
@@ -90,7 +96,11 @@ struct panel_info{
 
 struct panel_serial_number
 {
+<<<<<<< HEAD
 	char serial_number[41];
+=======
+	char serial_number[40];
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 };
 
 struct display_timing_info {
@@ -168,14 +178,19 @@ struct kernel_loglevel {
 #define PANEL_IOCTL_SET_LCM_CABC	          PANEL_IOW(0x2C, unsigned int)
 #define PANEL_IOCTL_GET_LCM_CABC		      PANEL_IOWR(0x2D, unsigned int)
 #define PANEL_IOCTL_SET_AOD_AREA	          PANEL_IOW(0x2E, unsigned int)
+<<<<<<< HEAD
 /*#define PANEL_IOCTL_SET_ESD                   PANEL_IOW(0x2F, unsigned int)*/
 #define PANEL_IOCTL_GET_OPLUS_MAXBRIGHTNESS   PANEL_IOWR(0x2F, unsigned int)
+=======
+#define PANEL_IOCTL_SET_ESD                   PANEL_IOW(0x2F, unsigned int)
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 #define PANEL_IOCTL_GET_ESD                   PANEL_IOW(0x30, unsigned int)
 #define PANEL_IOCTL_SET_MTK_LOG_LEVEL         PANEL_IOW(0x31, struct kernel_loglevel)
 
 /*oplus ioctl case end*/
 
 #endif /*_OPLUS_DISPLAY_PANEL_H_*/
+<<<<<<< HEAD
 =======
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
@@ -353,3 +368,5 @@ struct kernel_loglevel {
 
 #endif /*_OPLUS_DISPLAY_PANEL_H_*/
 >>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)

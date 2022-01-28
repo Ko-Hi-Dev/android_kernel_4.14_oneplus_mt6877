@@ -1,11 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_panel_power.c
 ** Description : oplus display panel power control
 ** Version : 1.0
 ** Date : 2020/06/13
+<<<<<<< HEAD
 ** Author : Li.Sheng@MULTIMEDIA.DISPLAY.LCD
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 **
 ** ------------------------------- Revision History: -----------
 **  <author>        <data>        <version >        <desc>
@@ -162,6 +168,7 @@ int oplus_display_panel_get_pwr(void *buf)
 }
 
 
+<<<<<<< HEAD
 =======
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
@@ -326,3 +333,5 @@ int oplus_display_panel_get_pwr(void *buf)
 
 
 >>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
+=======
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)

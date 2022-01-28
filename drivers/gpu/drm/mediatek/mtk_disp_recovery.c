@@ -37,15 +37,22 @@
 #include "mtk_drm_mmp.h"
 #include "mtk_drm_fbdev.h"
 #include "mtk_drm_trace.h"
+<<<<<<< HEAD
 #ifdef OPLUS_BUG_STABILITY
 #include <mt-plat/mtk_boot_common.h>
 #endif
+=======
+//#ifdef OPLUS_FEATURE_ESD
+#include <mt-plat/mtk_boot_common.h>
+//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 #define ESD_TRY_CNT 5
 //#ifndef OPLUS_FEATURE_ESD
 //#define ESD_CHECK_PERIOD 2000 /* ms */
 //#else
 #define ESD_CHECK_PERIOD 5000 /* ms */
+<<<<<<< HEAD
 /* add for TE check */
 #define TIMEOUT_MS 20
 extern unsigned long esd_mode;
@@ -57,6 +64,15 @@ extern int power_mode;
 unsigned long esd_flag = 0;
 EXPORT_SYMBOL(esd_flag);
 //#endif
+=======
+
+extern unsigned long esd_mode;
+extern unsigned int ffl_backlight_backup;
+unsigned long esd_flag = 0;
+EXPORT_SYMBOL(esd_flag);
+//#endif
+extern int power_mode;
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 /* pinctrl implementation */
 long _set_state(struct drm_crtc *crtc, const char *name)
@@ -131,7 +147,11 @@ static inline int _can_switch_check_mode(struct drm_crtc *crtc,
 static inline int _lcm_need_esd_check(struct mtk_panel_ext *panel_ext)
 {
 	int ret = 0;
+<<<<<<< HEAD
 #ifdef OPLUS_BUG_STABILITY
+=======
+//#ifdef OPLUS_FEATURE_ESD
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	switch(get_boot_mode())
 	{
 		case FACTORY_BOOT:
@@ -139,7 +159,11 @@ static inline int _lcm_need_esd_check(struct mtk_panel_ext *panel_ext)
 		default:
 				 break;
 	}
+<<<<<<< HEAD
 #endif
+=======
+//#endif
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	if (panel_ext->params->esd_check_enable == 1 &&
 		mtk_drm_lcm_is_connect()) {
 		ret = 1;
@@ -539,6 +563,7 @@ static int mtk_drm_esd_check_worker_kthread(void *data)
 			esd_ctx->check_task_wq,
 			atomic_read(&esd_ctx->check_wakeup) &&
 			(atomic_read(&esd_ctx->target_time) ||
+<<<<<<< HEAD
 			(panel_ext->params->cust_esd_check == 0) &&
 			 (esd_ctx->chk_mode == READ_EINT)));
 
@@ -551,6 +576,13 @@ static int mtk_drm_esd_check_worker_kthread(void *data)
 			(atomic_read(&esd_ctx->target_time) ||
 				esd_ctx->chk_mode == READ_EINT), msecs_to_jiffies(TIMEOUT_MS));
 		if (ret < 0 || power_mode != 2 || ffl_backlight_backup == 0 || ffl_backlight_backup == 1 || (ret == 0 && !atomic_read(&esd_ctx->check_wakeup))) {
+=======
+				esd_ctx->chk_mode == READ_EINT));
+		#ifndef OPLUS_BUG_STABILITY
+		if (ret < 0) {
+		#else
+		if (ret < 0 || ffl_backlight_backup == 0 || ffl_backlight_backup == 1 || power_mode != 2) {
+>>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 		#endif
 			DDPINFO("[ESD]check thread waked up accidently\n");
 			continue;

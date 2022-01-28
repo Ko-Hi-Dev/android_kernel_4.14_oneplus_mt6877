@@ -26,6 +26,10 @@
 					STACK_ALLOC_ALIGN) /* 9 */
 #define STACK_ALLOC_INDEX_BITS (DEPOT_STACK_BITS - \
 		STACK_ALLOC_NULL_PROTECTION_BITS - STACK_ALLOC_OFFSET_BITS) /* 22 */
+					STACK_ALLOC_ALIGN) //9
+#define STACK_ALLOC_INDEX_BITS (DEPOT_STACK_BITS - \
+		STACK_ALLOC_NULL_PROTECTION_BITS - STACK_ALLOC_OFFSET_BITS) //22
+
 #define STACK_ALLOC_SLABS_CAP 10240
 #define STACK_ALLOC_MAX_SLABS \
 	(((1LL << (STACK_ALLOC_INDEX_BITS)) < STACK_ALLOC_SLABS_CAP) ? \
@@ -147,6 +151,7 @@ int ml_stackdepot_memcmp(const unsigned long *u1, const unsigned long *u2,
 			unsigned int n)
 {
 	for (; n--; u1++, u2++) {
+	for ( ; n-- ; u1++, u2++) {
 		if (*u1 != *u2)
 			return 1;
 	}

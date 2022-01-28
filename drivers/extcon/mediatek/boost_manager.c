@@ -100,8 +100,6 @@ static enum alarmtimer_restart
 }
 #endif
 
-
-#if defined(CONFIG_OPLUS_CHARGER_MTK6889) || defined(CONFIG_OPLUS_CHARGER_MTK6877)
 extern bool oplus_otgctl_by_buckboost(void);
 extern int oplus_otg_enable_by_buckboost(void);
 extern int oplus_otg_disable_by_buckboost(void);
@@ -123,7 +121,6 @@ int usb_otg_set_vbus(int is_on)
 
 #if CONFIG_MTK_GAUGE_VERSION == 30
 	if (is_on) {
-#ifdef OPLUS_FEATURE_CHG_BASIC
 		if (oplus_otgctl_by_buckboost()) {
 			oplus_otg_enable_by_buckboost();
 		} else {
@@ -135,6 +132,17 @@ int usb_otg_set_vbus(int is_on)
 		charger_dev_enable_otg(g_info->primary_charger, true);
 		charger_dev_set_boost_current_limit(g_info->primary_charger,
 			1500000);
+				1100000);
+		}
+		if (g_info->polling_interval) {
+			charger_dev_kick_wdt(g_info->primary_charger);
+			enable_boost_polling(true);
+		}
+#else
+		printk("typec vbus_on\n");
+		charger_dev_enable_otg(g_info->primary_charger, true);
+		charger_dev_set_boost_current_limit(g_info->primary_charger,
+				1100000);
 #endif
 		if (g_info->polling_interval) {
 			charger_dev_kick_wdt(g_info->primary_charger);
@@ -153,7 +161,19 @@ int usb_otg_set_vbus(int is_on)
 		if (g_info->polling_interval) {
 			enable_boost_polling(false);
 		}
-	}
+#ifdef CONFIG_OPLUS_CHARGER_MTK6893
+		if (oplus_otgctl_by_buckboost()) {
+			oplus_otg_disable_by_buckboost();
+		} else {
+			charger_dev_enable_otg(g_info->primary_charger, false);
+		}
+		if (g_info->polling_interval)
+			enable_boost_polling(false);
+#else
+		charger_dev_enable_otg(g_info->primary_charger, false);
+		if (g_info->polling_interval)
+			enable_boost_polling(false);
+#endif
 #else
 	if (is_on) {
 		charger_dev_enable_otg(g_info->primary_charger, true);
@@ -164,6 +184,8 @@ int usb_otg_set_vbus(int is_on)
 		charger_dev_set_boost_current_limit(g_info->primary_charger,
 			1500000);
 #endif
+=======
+			1100000);
 	} else {
 		charger_dev_enable_otg(primary_charger, false);
 	}

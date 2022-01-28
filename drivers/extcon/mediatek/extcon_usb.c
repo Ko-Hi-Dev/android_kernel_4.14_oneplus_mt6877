@@ -24,6 +24,7 @@
 #include "extcon_usb.h"
 
 extern void oplus_chg_set_otg_online(bool online);
+<<<<<<< HEAD
 /*END OPLUS_FEATURE_CHG_BASIC*/
 struct usb_extcon_info {
 	struct device *dev;
@@ -183,6 +184,7 @@ void mt_usbhost_disconnect(void)
 
 	oplus_chg_set_otg_online(false);
 /*END OPLUS_FEATURE_CHG_BASIC*/
+
 	pr_info("%s\n", __func__);
 	issue_connection_work(DUAL_PROP_DR_NONE);
 }

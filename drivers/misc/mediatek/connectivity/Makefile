@@ -126,7 +126,7 @@ endif
         obj-y += wmt_chrdev_wifi/
         obj-y += wlan_drv_gen4m/
 
-         For BT built-in mode start @{
+         # For BT built-in mode start @{
          ifneq (,$(filter $(CONFIG_MTK_COMBO_CHIP), "CONSYS_6885"))
              PATH_TO_BT_DRV       = vendor/mediatek/kernel_modules/connectivity/bt/mt66xx/connac2
              export _MTK_BT_CHIP=MTK_CONSYS_MT6885

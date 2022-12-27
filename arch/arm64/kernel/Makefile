@@ -73,7 +73,7 @@ AFLAGS_head.o += -DVMLINUX_PATH="\"$(realpath $(objtree)/vmlinux)\""
 endif
 
 #ifdef CONFIG_OPLUS_SECURE_GUARD
-obj-$(CONFIG_OPLUS_SECURE_GUARD)		+=  rootguard/
-obj-$(CONFIG_OPLUS_SECURE_GUARD)                +=  oplus_root.o
+#obj-$(CONFIG_OPLUS_SECURE_GUARD)		+=  rootguard/
+#obj-$(CONFIG_OPLUS_SECURE_GUARD)                +=  oplus_root.o
 #endif /* CONFIG_OPLUS_SECURE_GUARD */
 

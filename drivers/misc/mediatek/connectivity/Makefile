@@ -169,7 +169,7 @@ endif
          obj-y += fmradio/
         # @} For FM built-in mode end
 
-         For GPS built-in mode start @{
+         #For GPS built-in mode start @{
          PATH_TO_GPS_DRV      = vendor/mediatek/kernel_modules/connectivity/gps
          ABS_PATH_TO_GPS_DRV      = $(srctree)/../$(PATH_TO_GPS_DRV)
          ifeq (,$(wildcard $(ABS_PATH_TO_GPS_DRV)))

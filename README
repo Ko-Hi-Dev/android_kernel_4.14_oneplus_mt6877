@@ -16,3 +16,19 @@ See Documentation/00-INDEX for a list of what is contained in each file.
 Please read the Documentation/process/changes.rst file, as it contains the
 requirements for building and running the kernel, and information about
 the problems which may result by upgrading your kernel.
+
+=================================
+
+To build this kernel follow this guide:
+
+https://gist.github.com/P1N2O/b9b2604c58aa4d7486e2fc0d327d23dc
+
+Also download this gcc: https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9
+
+point to your GCC 
+
+PATH="<path to clang folder>/bin:<path to gcc folder>/bin:${PATH}" \
+
+then you can run bash oplus_native_features.sh to build =)
+
+P.S to get Modules building you'll have to point to the directory

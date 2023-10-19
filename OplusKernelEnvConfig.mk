@@ -1,7 +1,6 @@
 # Copyright (C), 2008-2030, OPLUS Mobile Comm Corp., Ltd
 
 ### COLOROS_EDIT, All rights reserved.
-=======
 ###  All rights reserved.
 
 ###

@@ -129,9 +129,7 @@ u64 _slide_get_boost_load(int cpu)
 
 void adjust_sched_assist_input_ctrl(void)
 {
-=======
 void adjust_sched_assist_input_ctrl(void){
->>>>>>> c49aca71c3b1... treewide: Fix includes, clang format constructors
 	if (!sysctl_input_boost_enabled)
 		return;
 	if (sysctl_slide_boost_enabled) {

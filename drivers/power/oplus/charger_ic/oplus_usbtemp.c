@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 #include <linux/ktime.h>
 #include <linux/delay.h>
@@ -40,14 +39,13 @@ struct wakeup_source *usbtemp_wakelock;
 #define RETRY_CNT_DELAY         5 //ms
 #define HIGH_TEMP_SHORT_CHECK_TIMEOUT 1000 /*ms*/
 
-<<<<<<< HEAD
+
 #define USBTEMP_RECOVER_INTERVAL   (14400*1000) /*4 hours*/
 #define USBTEMP_CC_RECOVER_INTERVAL   (300*1000) /*5 mins*/
 
 int __attribute__((weak)) qpnp_get_prop_charger_voltage_now() {return 0;}
-=======
+
 int __attribute__((weak)) qpnp_get_prop_charger_voltage_now(void) {return 0;}
->>>>>>> c49aca71c3b1... treewide: Fix includes, clang format constructors
 
 static int usbtemp_debug = 0;
 module_param(usbtemp_debug, int, 0644);

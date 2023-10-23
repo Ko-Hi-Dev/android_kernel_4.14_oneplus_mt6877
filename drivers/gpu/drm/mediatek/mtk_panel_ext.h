@@ -241,17 +241,14 @@ struct mtk_panel_params {
 	unsigned int output_mode;
 	unsigned int hbm_en_time;
 	unsigned int hbm_dis_time;
-<<<<<<< HEAD
 	unsigned int before_hbm_en_time;
 	unsigned int before_hbm_en_delay_time;
 	unsigned int before_hbm_dis_time;
-=======
 	/* #ifdef OPLUS_BUG_STABILITY */
 	unsigned int before_hbm_en_time;
 	unsigned int before_hbm_en_delay_time;
 	unsigned int before_hbm_dis_time;
 	/* #endif */ /* OPLUS_BUG_STABILITY */
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	unsigned int lcm_index;
 	unsigned int wait_sof_before_dec_vfp;
 	unsigned int doze_delay;
@@ -323,13 +320,10 @@ struct mtk_panel_funcs {
 	int (*panel_poweroff)(struct drm_panel *panel);
 	int (*panel_poweron)(struct drm_panel *panel);
 	void (*hbm_set_state)(struct drm_panel *panel, bool state);
-<<<<<<< HEAD
-	int (*set_global_hbm1)(void *dsi_drv, dcs_write_gce cb,
+	int (*set_global_hbm1)(void *dsi_drv, dcs_write_gce_cb,
 		void *handle, unsigned int global_hbm_mode);
 	int (*set_global_hbm2)(void *dsi_drv, dcs_write_gce cb,
 		void *handle, unsigned int global_hbm_mode);
-=======
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	int (*set_hbm)(void *dsi_drv, dcs_write_gce cb,
 		void *handle, unsigned int hbm_mode);
 	int (*set_seed)(void *dsi_drv, dcs_write_gce cb,
@@ -413,28 +407,22 @@ struct mtk_panel_funcs {
 	void (*hbm_get_state)(struct drm_panel *panel, bool *state);
 	void (*hbm_get_wait_state)(struct drm_panel *panel, bool *wait);
 	bool (*hbm_set_wait_state)(struct drm_panel *panel, bool wait);
-<<<<<<< HEAD
 	void (*cabc_switch)(void *dsi_drv, dcs_write_gce cb,
 		void *handle, unsigned int cabc_mode);
 	int (*esd_backlight_check)(void *dsi_drv, dcs_write_gce cb,
 		void *handle);
-=======
 	int (*esd_backlight_check)(void *dsi_drv, dcs_write_gce cb,
 		void *handle);
 	/*#ifdef OPLUS_BUG_STABILITY*/
 	int (*lcm_osc_change)(void *dsi, dcs_write_gce cb, void *handle, bool en);
 	/*#endif*/
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	int (*oplus_get_aod_state)(void);
 	#ifdef OPLUS_BUG_STABILITY
 	int (*set_dc_backlight)(void *dsi_drv, dcs_write_gce cb,
 		void *handle, unsigned int level);
-<<<<<<< HEAD
 	int (*send_cmd_before_dsi_read)(struct drm_panel *panel);
 	int (*lcm_osc_freq_change)(void *dsi, dcs_write_gce cb, void *handle, int en);
-=======
 	int (*esd_check_precondition)(void *dsi, dcs_write_gce cb, void *handle);
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 	#endif /* OPLUS_BUG_STABILITY */
 };
 

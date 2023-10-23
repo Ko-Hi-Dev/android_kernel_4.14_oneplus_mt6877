@@ -81,9 +81,7 @@
 #ifdef CONFIG_MTK_CMDQ_MBOX
 #define MTK_DRM_CMDQ_ASYNC
 #define CONFIG_MTK_DISPLAY_CMDQ
-<<<<<<< HEAD
 #endif
-=======
 #define MTK_FILL_MIPI_IMPEDANCE
 #if (defined(CONFIG_MACH_MT6885) || defined(CONFIG_MACH_MT6873)\
 	|| defined(CONFIG_MACH_MT6893) ||\
@@ -98,7 +96,6 @@
 * add for fingerprint notify frigger
 */
 #define MTK_ONSCREENFINGERPRINT_EVENT 20
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 
 struct device;
 struct device_node;

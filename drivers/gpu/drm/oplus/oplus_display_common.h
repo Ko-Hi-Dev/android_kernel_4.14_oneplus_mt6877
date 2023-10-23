@@ -1,17 +1,9 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_common.c
 ** Description : oplus common feature
 ** Version : 1.0
 ** Date : 2020/07/1
-<<<<<<< HEAD
-** Author : JianBin.Zhang@MM.Display.LCD Driver
-=======
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 **
 ** ------------------------------- Revision History: -----------
 **  <author>        <data>        <version >        <desc>
@@ -35,7 +27,6 @@ int oplus_display_panel_get_esd(void *buf);
 <<<<<<< HEAD
 int oplus_display_panel_get_oplus_max_brightness(void *buf);
 #endif /*_OPLUS_DISPLAY_COMMON_H_*/
-=======
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_common.c
@@ -63,7 +54,3 @@ int oplus_display_panel_get_cabc(void *buf);
 int oplus_display_panel_set_esd(void *buf);
 int oplus_display_panel_get_esd(void *buf);
 #endif /*_OPLUS_DISPLAY_COMMON_H_*/
->>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
-=======
-#endif /*_OPLUS_DISPLAY_COMMON_H_*/
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)

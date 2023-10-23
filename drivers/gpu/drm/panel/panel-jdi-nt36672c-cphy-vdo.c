@@ -16,11 +16,8 @@
 #include <drm/drmP.h>
 #include <drm/drm_mipi_dsi.h>
 #include <drm/drm_panel.h>
-<<<<<<< HEAD
 #include <soc/oplus/system/oplus_project.h>
-=======
 #include <soc/oplus/oplus_project.h>
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 #include <linux/gpio/consumer.h>
 #include <linux/of_graph.h>
 #include <video/mipi_display.h>

@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_panel_power.c
@@ -167,9 +163,6 @@ int oplus_display_panel_get_pwr(void *buf)
 	return ret;
 }
 
-
-<<<<<<< HEAD
-=======
 /***************************************************************
 ** Copyright (C),  2020,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_panel_power.c
@@ -330,8 +323,3 @@ int oplus_display_panel_get_pwr(void *buf)
 
 	return ret;
 }
-
-
->>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
-=======
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)

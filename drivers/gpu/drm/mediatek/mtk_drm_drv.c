@@ -54,15 +54,10 @@
 #include "mtk_disp_gamma.h"
 #include "mtk_disp_aal.h"
 #include "mtk_drm_mmp.h"
-<<<<<<< HEAD
-#include <mt-plat/mtk_boot_common.h>
-extern unsigned long silence_mode;
-=======
 
 #include <mt-plat/mtk_boot_common.h>
 extern unsigned long silence_mode;
 
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /* *******Panel Master******** */
 #include "mtk_fbconfig_kdebug.h"
 #ifdef CONFIG_MTK_HDMI_SUPPORT

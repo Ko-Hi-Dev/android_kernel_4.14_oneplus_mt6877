@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 /***************************************************************
 ** Copyright (C),  2018,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_private_api.h
@@ -61,10 +57,7 @@
 #include "mtk_drm_arr.h"
 #include "mtk_drm_trace.h"
 
-<<<<<<< HEAD
-=======
 #define OPLUS_SILKY_MAX_BRIGHTNESS 8191
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 #define OPLUS_MAX_BRIGHTNESS 4095
 #define OPLUS_NORMAL_MAX_BRIGHTNESS 2047
 #define OPLUS_MIN_BRIGHTNESS 0
@@ -133,11 +126,7 @@ struct mtk_dsi {
 };
 
 
-<<<<<<< HEAD
-/* aod_area begin
-=======
 /* aod_area begin */
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 struct aod_area {
 	bool enable;
 	int x;
@@ -152,12 +141,10 @@ struct aod_area {
 
 #define RAMLESS_AOD_AREA_NUM		6
 #define RAMLESS_AOD_PAYLOAD_SIZE	100
-<<<<<<< HEAD
 struct aod_area oplus_aod_area[RAMLESS_AOD_AREA_NUM];
 char send_cmd[RAMLESS_AOD_PAYLOAD_SIZE];
 */
 
-=======
 /***************************************************************
 ** Copyright (C),  2018,  OPLUS Mobile Comm Corp.,  Ltd
 ** File : oplus_display_private_api.h
@@ -298,8 +285,4 @@ struct aod_area {
 #define RAMLESS_AOD_AREA_NUM		6
 #define RAMLESS_AOD_PAYLOAD_SIZE	100
 
->>>>>>> 34fd54d3b8bc... treewide : Run dos2unix
-=======
-
->>>>>>> 9afedf7df7a1 (drivers/gpu/drm: Import Oneplus changes)
 #endif /* _OPLUS_DISPLAY_PRIVATE_API_H_ */
